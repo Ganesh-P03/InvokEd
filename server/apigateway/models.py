@@ -17,6 +17,26 @@ class Teacher(models.Model):
     def __str__(self):
         return self.TID
 
+class Student(models.Model):
+    StudentID = models.CharField(primary_key=True, max_length=100, default=uuid.uuid4)
+    Name = models.CharField(max_length=255)
+    DateofJoining = models.DateField()
+    ClassroomID = models.ForeignKey('Classroom', to_field='ClassroomID', on_delete=models.SET_NULL, null=True, blank=True)  # Assuming Classroom model exists
+    GuardianName = models.CharField(max_length=255)
+    GuardianRelation = models.CharField(max_length=100)
+    GuardianPhone = models.CharField(max_length=15)
+    Email = models.EmailField(unique=True)
+
+    def __str__(self):
+        return f"{self.Name} ({self.StudentID})"
+
+class Classroom(models.Model):
+    ClassroomID = models.CharField(primary_key=True, max_length=10)
+    ClassTeacherID = models.ForeignKey('Teacher', on_delete=models.SET_NULL, null=True, blank=True)
+
+    def __str__(self):
+        return self.ClassroomID
+
 class Subject(models.Model):
     SubjectID = models.AutoField(primary_key=True)
     SubjectName = models.CharField(max_length=255, unique=True)
