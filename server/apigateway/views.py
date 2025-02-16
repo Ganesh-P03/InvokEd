@@ -1,6 +1,6 @@
 from django.shortcuts import render
-from .models import  LoginInfo,Subject,Teacher,Classroom,Student
-from .serializers import  LoginInfoSerializer,SubjectSerializer,TeacherSerializer,ClassroomSerializer,StudentSerializer
+from .models import  LoginInfo,Subject,Teacher,Classroom,Student,Attendance
+from .serializers import  LoginInfoSerializer,SubjectSerializer,TeacherSerializer,ClassroomSerializer,StudentSerializer,AttendanceSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -279,3 +279,71 @@ def subject_detail(request, SubjectID):
     elif request.method == 'DELETE':
         subject.delete()
         return Response({'message': 'Subject deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+
+# views for Attendance
+# 📌 URL: /attendance/
+@api_view(['GET', 'POST'])
+def attendance_list(request):
+    """
+    GET  /attendance/?StudentId=1&StartDate=2025-02-01&EndDate=2025-02-15  -> Get all attendance data (with optional filters)
+    POST /attendance/  -> Create one or multiple attendance records
+    """
+    if request.method == 'GET':
+        print(request)
+        student_id = request.GET.get('StudentId')
+        start_date = request.GET.get('StartDate')
+        end_date = request.GET.get('EndDate')
+
+        attendance = Attendance.objects.all()
+
+        if student_id:
+            attendance = attendance.filter(StudentID=student_id)
+        if start_date and end_date:
+            attendance = attendance.filter(Date__range=[start_date, end_date])
+        elif start_date:  # If only start date is given, fetch from that date onwards
+            attendance = attendance.filter(Date__gte=start_date)
+        elif end_date:  # If only end date is given, fetch up to that date
+            attendance = attendance.filter(Date__lte=end_date)
+
+        serializer = AttendanceSerializer(attendance, many=True)
+        return Response(serializer.data)
+
+    elif request.method == 'POST':
+        if isinstance(request.data, list):
+            serializer = AttendanceSerializer(data=request.data, many=True)
+        else:
+            serializer = AttendanceSerializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+# 📌 URL: /attendance/<AttendanceID>/
+@api_view(['GET', 'PUT', 'DELETE'])
+def attendance_detail(request, AttendanceID):
+    """
+    GET    /attendance/<AttendanceID>/  -> Retrieve attendance record
+    PUT    /attendance/<AttendanceID>/  -> Update attendance record
+    DELETE /attendance/<AttendanceID>/  -> Delete attendance record
+    """
+    try:
+        attendance = Attendance.objects.get(AttendanceID=AttendanceID)
+    except Attendance.DoesNotExist:
+        return Response({"error": "Attendance record not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        serializer = AttendanceSerializer(attendance)
+        return Response(serializer.data)
+
+    elif request.method == 'PUT':
+        serializer = AttendanceSerializer(attendance, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'DELETE':
+        attendance.delete()
+        return Response({"message": "Attendance record deleted successfully"}, status=status.HTTP_204_NO_CONTENT)

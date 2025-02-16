@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from apigateway.views import subject_list,subject_detail,teacher_list,teacher_detail,logininfo_list,logininfo_detail,classroom_list,classroom_detail,student_list,student_detail
+from apigateway.views import subject_list,subject_detail,teacher_list,teacher_detail,logininfo_list,logininfo_detail,classroom_list,classroom_detail,student_list,student_detail,attendance_list,attendance_detail
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -31,11 +31,15 @@ urlpatterns = [
     path('teachers/', teacher_list, name='teacher-list-create'),  # GET, POST
     path('teachers/<str:TID>/', teacher_detail, name='teacher-detail'),  # GET, PUT, DELETE
 
-    # # Student URLs
+    # Student URLs
     path('students/', student_list, name='student-list'),  # List & Create Students
     path('students/<str:StudentID>/', student_detail, name='student-detail'),  # Retrieve, Update, Delete Student
 
-    # # Classrrom URLs
+    # Classrrom URLs
     path('classrooms/', classroom_list, name='classroom-list'),  # List & Create Classrooms
     path('classrooms/<str:ClassroomID>/', classroom_detail, name='classroom-detail'),  # Retrieve, Update, Delete Classroom
+
+    # Attendance URLs
+    path('attendance/', attendance_list, name='attendance-list'),  # List & Create Attendance (bulk support)
+    path('attendance/<int:AttendanceID>/', attendance_detail, name='attendance-detail'),  # Retrieve, Update, Delete
 ]

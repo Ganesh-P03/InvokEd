@@ -37,6 +37,18 @@ class Classroom(models.Model):
     def __str__(self):
         return self.ClassroomID
 
+class Attendance(models.Model):
+    AttendanceID = models.AutoField(primary_key=True)
+    StudentID = models.ForeignKey(Student, on_delete=models.CASCADE)  # Delete attendance if student is removed
+    Date = models.DateField()
+    Status = models.IntegerField(default=0)  # 0 -> Absent, 1 -> Present
+
+    class Meta:
+        unique_together = ('StudentID', 'Date')  # Ensures one attendance record per student per day
+
+    def __str__(self):
+        return f"{self.StudentID.Name} - {self.Date} - {'Present' if self.Status == 1 else 'Absent'}"
+
 class Subject(models.Model):
     SubjectID = models.AutoField(primary_key=True)
     SubjectName = models.CharField(max_length=255, unique=True)
