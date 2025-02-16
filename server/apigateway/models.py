@@ -55,5 +55,14 @@ class Subject(models.Model):
 
     def __str__(self):
         return self.SubjectName
-    
+
+class TimeTable(models.Model):
+    TimeTableID = models.AutoField(primary_key=True)  # Explicit primary key
+    ClassroomID = models.ForeignKey('Classroom', on_delete=models.CASCADE)  # Classroom ID
+    Day = models.CharField(max_length=10)  # Example: Monday, Tuesday
+    Slot = models.IntegerField()  # Example: 1, 2, 3 (Period numbers)
+    SubjectID = models.ForeignKey('Subject', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.CID} - {self.Day} - Slot {self.Slot}"
 

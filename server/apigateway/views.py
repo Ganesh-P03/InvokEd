@@ -1,6 +1,6 @@
 from django.shortcuts import render
-from .models import  LoginInfo,Subject,Teacher,Classroom,Student,Attendance
-from .serializers import  LoginInfoSerializer,SubjectSerializer,TeacherSerializer,ClassroomSerializer,StudentSerializer,AttendanceSerializer
+from .models import  LoginInfo,Subject,Teacher,Classroom,Student,Attendance,TimeTable
+from .serializers import  LoginInfoSerializer,SubjectSerializer,TeacherSerializer,ClassroomSerializer,StudentSerializer,AttendanceSerializer,TimeTableSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -347,3 +347,67 @@ def attendance_detail(request, AttendanceID):
     elif request.method == 'DELETE':
         attendance.delete()
         return Response({"message": "Attendance record deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+
+# 📌 URL: /timetable/
+@api_view(['GET', 'POST'])
+def timetable_list(request):
+    """
+    GET  /timetable/?ClassroomID=<ClassroomID>&Day=<Day>&Slot<Slot> -> Get all timetable entries (with optional filters)
+    POST /timetable/ -> Create one or multiple timetable entries
+    """
+    if request.method == 'GET':
+        classroom_id = request.GET.get('ClassroomID')
+        day = request.GET.get('Day')
+        slot = request.GET.get('Slot')
+
+        timetable = TimeTable.objects.all()
+
+        if classroom_id:
+            timetable = timetable.filter(ClassroomID=classroom_id)
+        if day:
+            timetable = timetable.filter(Day=day)
+        if slot:
+            timetable = timetable.filter(Slot=slot)
+
+        serializer = TimeTableSerializer(timetable, many=True)
+        return Response(serializer.data)
+
+    elif request.method == 'POST':
+        if isinstance(request.data, list):
+            serializer = TimeTableSerializer(data=request.data, many=True)
+        else:
+            serializer = TimeTableSerializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# 📌 URL: /timetable/<int:TimeTableID>/
+@api_view(['GET', 'PUT', 'DELETE'])
+def timetable_detail(request, TimeTableID):
+    """
+    GET    /timetable/<TimeTableID>/  -> Retrieve a specific timetable entry
+    PUT    /timetable/<TimeTableID>/  -> Update a timetable entry
+    DELETE /timetable/<TimeTableID>/  -> Delete a timetable entry
+    """
+    try:
+        timetable = TimeTable.objects.get(TimeTableID=TimeTableID)
+    except TimeTable.DoesNotExist:
+        return Response({'error': 'TimeTable entry not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        serializer = TimeTableSerializer(timetable)
+        return Response(serializer.data)
+
+    elif request.method == 'PUT':
+        serializer = TimeTableSerializer(timetable, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'DELETE':
+        timetable.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
