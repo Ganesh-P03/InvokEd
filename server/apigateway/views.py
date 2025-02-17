@@ -1,8 +1,8 @@
 from django.shortcuts import render
-from .models import  LoginInfo,Subject,Teacher,Classroom,Student,Attendance,TimeTable,Syllabus,Chapter
+from .models import  LoginInfo,Subject,Teacher,Classroom,Student,Attendance,TimeTable,Syllabus,Chapter,Module
 from .serializers import  LoginInfoSerializer,SubjectSerializer,TeacherSerializer,ClassroomSerializer, \
                           StudentSerializer,AttendanceSerializer,TimeTableSerializer,SyllabusSerializer, \
-                          ChapterSerializer
+                          ChapterSerializer,ModuleSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -349,6 +349,7 @@ def attendance_detail(request, AttendanceID):
         attendance.delete()
         return Response({"message": "Attendance record deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
 
+# views for TimeTable
 # 📌 URL: /timetable/
 @api_view(['GET', 'POST'])
 def timetable_list(request):
@@ -531,3 +532,59 @@ def chapter_detail(request, ChapterID):
     elif request.method == 'DELETE':
         chapter.delete()
         return Response({'message': 'Chapter deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
+
+# views for Module
+# 📌 URL: /modules/
+@api_view(['GET', 'POST'])
+def module_list(request):
+    """
+    GET  /modules/?ChapterID=<ChapterID>  -> List all modules (optional filter by ChapterID)
+    POST /modules/  -> Create a new module (single or bulk)
+    """
+    chapter_id = request.GET.get('ChapterID')
+
+    if request.method == 'GET':
+        if chapter_id:
+            modules = Module.objects.filter(ChapterID=chapter_id)
+        else:
+            modules = Module.objects.all()
+        serializer = ModuleSerializer(modules, many=True)
+        return Response(serializer.data)
+
+    elif request.method == 'POST':
+        if isinstance(request.data, list):  # 📌 Handle bulk module creation
+            serializer = ModuleSerializer(data=request.data, many=True)
+        else:  # 📌 Handle single module creation
+            serializer = ModuleSerializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET', 'PUT', 'DELETE'])
+def module_detail(request, ModuleID):
+    """
+    GET    /modules/<ModuleID>/  -> Retrieve a specific module
+    PUT    /modules/<ModuleID>/  -> Update a specific module
+    DELETE /modules/<ModuleID>/  -> Delete a specific module
+    """
+    try:
+        module = Module.objects.get(ModuleID=ModuleID)
+    except Module.DoesNotExist:
+        return Response({'error': 'Module not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        serializer = ModuleSerializer(module)
+        return Response(serializer.data)
+
+    elif request.method == 'PUT':
+        serializer = ModuleSerializer(module, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'DELETE':
+        module.delete()
+        return Response({'message': 'Module deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)

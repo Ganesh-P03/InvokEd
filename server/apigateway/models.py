@@ -83,3 +83,14 @@ class Chapter(models.Model):
 
     def __str__(self):
         return self.ChapterName
+
+class Module(models.Model):
+    ModuleID = models.CharField(primary_key=True, max_length=100, default=uuid.uuid4)
+    ChapterID = models.ForeignKey('Chapter', on_delete=models.CASCADE)
+    ModuleName = models.CharField(max_length=255)
+    RemainingTime = models.IntegerField(help_text="Number of teaching hours required")
+    URL = models.URLField(blank=True, null=True)
+    ThisWeek = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.ModuleName
