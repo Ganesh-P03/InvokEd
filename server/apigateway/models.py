@@ -104,3 +104,12 @@ class Exam(models.Model):
 
     def __str__(self):
         return self.ExamName
+
+class Marks(models.Model):
+    MarksID = models.CharField(primary_key=True, max_length=100, default=uuid.uuid4)
+    StudentID = models.ForeignKey('Student', on_delete=models.CASCADE)
+    ExamID = models.ForeignKey('Exam', on_delete=models.CASCADE)  # Foreign key to Exam
+    Marks = models.IntegerField()
+
+    def __str__(self):
+        return f"MarksID: {self.MarksID} - {self.StudentID} - {self.ExamID}: {self.Marks}"

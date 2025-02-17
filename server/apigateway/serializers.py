@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import  LoginInfo,Subject,Teacher,Classroom,Student,Attendance,TimeTable,Syllabus,Chapter,Module,Exam
+from .models import  LoginInfo,Subject,Teacher,Classroom,Student,Attendance,TimeTable,Syllabus,Chapter,Module,Exam,Marks
 
 class LoginInfoSerializer(serializers.ModelSerializer):
     class Meta:
@@ -57,4 +57,9 @@ class ExamSerializer(serializers.ModelSerializer):
     class Meta:
         model = Exam
         fields = ['ExamID', 'ExamName', 'DateOfExam', 'Chapters', 'SyllabusID']
+
+class MarksSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Marks
+        fields = ['MarksID', 'StudentID', 'ExamID', 'Marks']
 

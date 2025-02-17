@@ -22,7 +22,7 @@ from apigateway.views import subject_list,subject_detail,teacher_list,teacher_de
                              student_detail,attendance_list,attendance_detail,\
                              timetable_detail,timetable_list,syllabus_detail,syllabus_list, \
                              chapter_list,chapter_detail,module_list,module_detail, \
-                             exam_list,exam_detail
+                             exam_list,exam_detail,marks_list,marks_detail
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -68,4 +68,8 @@ urlpatterns = [
     #Exam URLs
     path('exams/', exam_list, name='exam-list'),
     path('exams/<str:ExamID>/', exam_detail, name='exam-detail'),
+
+    #Marks URLs
+    path('marks/', marks_list, name='marks_list'),  # To list marks with optional filters
+    path('marks/<str:MarksID>/', marks_detail, name='marks_detail'),  # To view/update/delete a specific marks entry
 ]

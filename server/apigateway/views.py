@@ -1,8 +1,8 @@
 from django.shortcuts import render
-from .models import  LoginInfo,Subject,Teacher,Classroom,Student,Attendance,TimeTable,Syllabus,Chapter,Module,Exam
+from .models import  LoginInfo,Subject,Teacher,Classroom,Student,Attendance,TimeTable,Syllabus,Chapter,Module,Exam,Marks
 from .serializers import  LoginInfoSerializer,SubjectSerializer,TeacherSerializer,ClassroomSerializer, \
                           StudentSerializer,AttendanceSerializer,TimeTableSerializer,SyllabusSerializer, \
-                          ChapterSerializer,ModuleSerializer,ExamSerializer
+                          ChapterSerializer,ModuleSerializer,ExamSerializer,MarksSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -675,3 +675,67 @@ def exam_detail(request, ExamID):
     elif request.method == 'DELETE':
         exam.delete()
         return Response({'message': 'Exam deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
+
+# views for Marks
+# 📌 URL: /marks/
+@api_view(['GET','POST'])
+def marks_list(request):
+    """
+    GET  /marks/?StudentID=<StudentID>&ExamID=<ExamID>  -> Filter Marks by student and exam.
+    POST /marks/  -> Create a new Marks entry or multiple entries.
+    """
+    if request.method == 'GET':
+        marks = Marks.objects.all()
+
+        # Optional filtering by StudentID and ExamID
+        student_id = request.query_params.get('StudentID', None)
+        exam_id = request.query_params.get('ExamID', None)
+
+        if student_id:
+            marks = marks.filter(StudentID=student_id)
+        
+        if exam_id:
+            marks = marks.filter(ExamID=exam_id)
+
+        serializer = MarksSerializer(marks, many=True)
+        return Response(serializer.data)
+    elif request.method == 'POST':
+        if isinstance(request.data, list):  # Bulk create marks entries
+            serializer = MarksSerializer(data=request.data, many=True)
+        else:  # Create a single marks entry
+            serializer = MarksSerializer(data=request.data)
+
+        # Check if the data is valid
+        if serializer.is_valid():
+            serializer.save()  # Save the marks entry/entries
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# marks_detail
+@api_view(['GET', 'PUT', 'DELETE'])
+def marks_detail(request, MarksID):
+    """
+    GET  /marks/<MarksID>/  -> Get a specific Marks entry.
+    PUT  /marks/<MarksID>/  -> Update a specific Marks entry.
+    DELETE /marks/<MarksID>/  -> Delete a specific Marks entry.
+    """
+    try:
+        marks = Marks.objects.get(MarksID=MarksID)
+    except Marks.DoesNotExist:
+        return Response({'error': 'Marks entry not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        serializer = MarksSerializer(marks)
+        return Response(serializer.data)
+
+    elif request.method == 'PUT':
+        serializer = MarksSerializer(marks, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'DELETE':
+        marks.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
