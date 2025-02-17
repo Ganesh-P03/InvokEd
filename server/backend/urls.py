@@ -20,7 +20,8 @@ from apigateway.views import subject_list,subject_detail,teacher_list,teacher_de
                              logininfo_list,logininfo_detail,\
                              classroom_list,classroom_detail,student_list,\
                              student_detail,attendance_list,attendance_detail,\
-                             timetable_detail,timetable_list,syllabus_detail,syllabus_list
+                             timetable_detail,timetable_list,syllabus_detail,syllabus_list, \
+                             chapter_list,chapter_detail
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -54,4 +55,8 @@ urlpatterns = [
     #Syllabus URLs
     path('syllabus/', syllabus_list, name='syllabus-list'),
     path('syllabus/<str:SyllabusID>/', syllabus_detail, name='syllabus-detail'),
+
+    #Chapter URLs
+    path('chapters/', chapter_list, name='chapter-list'),
+    path('chapters/<str:ChapterID>/', chapter_detail, name='chapter-detail'),
 ]

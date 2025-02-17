@@ -1,6 +1,8 @@
 from django.shortcuts import render
-from .models import  LoginInfo,Subject,Teacher,Classroom,Student,Attendance,TimeTable,Syllabus
-from .serializers import  LoginInfoSerializer,SubjectSerializer,TeacherSerializer,ClassroomSerializer,StudentSerializer,AttendanceSerializer,TimeTableSerializer,SyllabusSerializer
+from .models import  LoginInfo,Subject,Teacher,Classroom,Student,Attendance,TimeTable,Syllabus,Chapter
+from .serializers import  LoginInfoSerializer,SubjectSerializer,TeacherSerializer,ClassroomSerializer, \
+                          StudentSerializer,AttendanceSerializer,TimeTableSerializer,SyllabusSerializer, \
+                          ChapterSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -473,3 +475,59 @@ def syllabus_detail(request, SyllabusID):
     elif request.method == 'DELETE':
         syllabus.delete()
         return Response({'message': 'Syllabus entry deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
+
+# views for Chapter
+# 📌 URL: /chapters/
+@api_view(['GET', 'POST'])
+def chapter_list(request):
+    """
+    GET  /chapters/?SyllabusID=<SyllabusID>  -> List all chapters (optional filter by SyllabusID)
+    POST /chapters/  -> Create a new chapter (single or bulk)
+    """
+    syllabus_id = request.GET.get('SyllabusID')
+
+    if request.method == 'GET':
+        if syllabus_id:
+            chapters = Chapter.objects.filter(SyllabusID=syllabus_id)
+        else:
+            chapters = Chapter.objects.all()
+        serializer = ChapterSerializer(chapters, many=True)
+        return Response(serializer.data)
+
+    elif request.method == 'POST':
+        if isinstance(request.data, list):  # 📌 Handle bulk chapter creation
+            serializer = ChapterSerializer(data=request.data, many=True)
+        else:  # 📌 Handle single chapter creation
+            serializer = ChapterSerializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET', 'PUT', 'DELETE'])
+def chapter_detail(request, ChapterID):
+    """
+    GET    /chapters/<ChapterID>/  -> Retrieve a specific chapter
+    PUT    /chapters/<ChapterID>/  -> Update a specific chapter
+    DELETE /chapters/<ChapterID>/  -> Delete a specific chapter
+    """
+    try:
+        chapter = Chapter.objects.get(ChapterID=ChapterID)
+    except Chapter.DoesNotExist:
+        return Response({'error': 'Chapter not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        serializer = ChapterSerializer(chapter)
+        return Response(serializer.data)
+
+    elif request.method == 'PUT':
+        serializer = ChapterSerializer(chapter, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'DELETE':
+        chapter.delete()
+        return Response({'message': 'Chapter deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)

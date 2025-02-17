@@ -74,3 +74,12 @@ class Syllabus(models.Model):
 
     def __str__(self):
         return f"Syllabus for {self.ClassroomID} - {self.SubjectID}"
+
+class Chapter(models.Model):
+    ChapterID = models.CharField(primary_key=True, max_length=100, default=uuid.uuid4)
+    SyllabusID = models.ForeignKey('Syllabus', on_delete=models.CASCADE)
+    ChapterName = models.CharField(max_length=255)
+    TargetDate = models.DateField()
+
+    def __str__(self):
+        return self.ChapterName
