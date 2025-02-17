@@ -20,7 +20,7 @@ from apigateway.views import subject_list,subject_detail,teacher_list,teacher_de
                              logininfo_list,logininfo_detail,\
                              classroom_list,classroom_detail,student_list,\
                              student_detail,attendance_list,attendance_detail,\
-                             timetable_detail,timetable_list
+                             timetable_detail,timetable_list,syllabus_detail,syllabus_list
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -50,4 +50,8 @@ urlpatterns = [
     # TimeTable URLs
     path('timetable/', timetable_list, name='timetable-list'),  # List & Create
     path('timetable/<int:TimeTableID>/', timetable_detail, name='timetable-detail'),  # Retrieve, Update, Delete
+
+    #Syllabus URLs
+    path('syllabus/', syllabus_list, name='syllabus-list'),
+    path('syllabus/<str:SyllabusID>/', syllabus_detail, name='syllabus-detail'),
 ]

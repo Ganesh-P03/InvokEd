@@ -1,6 +1,6 @@
 from django.shortcuts import render
-from .models import  LoginInfo,Subject,Teacher,Classroom,Student,Attendance,TimeTable
-from .serializers import  LoginInfoSerializer,SubjectSerializer,TeacherSerializer,ClassroomSerializer,StudentSerializer,AttendanceSerializer,TimeTableSerializer
+from .models import  LoginInfo,Subject,Teacher,Classroom,Student,Attendance,TimeTable,Syllabus
+from .serializers import  LoginInfoSerializer,SubjectSerializer,TeacherSerializer,ClassroomSerializer,StudentSerializer,AttendanceSerializer,TimeTableSerializer,SyllabusSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -289,7 +289,6 @@ def attendance_list(request):
     POST /attendance/  -> Create one or multiple attendance records
     """
     if request.method == 'GET':
-        print(request)
         student_id = request.GET.get('StudentId')
         start_date = request.GET.get('StartDate')
         end_date = request.GET.get('EndDate')
@@ -411,3 +410,66 @@ def timetable_detail(request, TimeTableID):
     elif request.method == 'DELETE':
         timetable.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+# views for Syllabus
+# 📌 URL: /syllabus/
+@api_view(['GET', 'POST'])
+def syllabus_list(request):
+    """
+    GET  /syllabus/?ClassroomID=<ClassroomID>&SubjectID=<SubjectID>&TID=<TID>  
+    POST /syllabus/  -> Create a new syllabus (single or bulk)
+    """
+    if request.method == 'GET':
+        classroom_id = request.GET.get('ClassroomID')
+        subject_id = request.GET.get('SubjectID')
+        teacher_id = request.GET.get('TID')
+
+        filters = {}
+        if classroom_id:
+            filters['ClassroomID'] = classroom_id
+        if subject_id:
+            filters['SubjectID'] = subject_id
+        if teacher_id:
+            filters['TID'] = teacher_id
+
+        syllabus = Syllabus.objects.filter(**filters)
+        serializer = SyllabusSerializer(syllabus, many=True)
+        return Response(serializer.data)
+
+    elif request.method == 'POST':
+        if isinstance(request.data, list):  # 📌 Handle bulk syllabus creation
+            serializer = SyllabusSerializer(data=request.data, many=True)
+        else:  # 📌 Handle single syllabus creation
+            serializer = SyllabusSerializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET', 'PUT', 'DELETE'])
+def syllabus_detail(request, SyllabusID):
+    """
+    GET    /syllabus/<SyllabusID>/  -> Retrieve a specific syllabus entry
+    PUT    /syllabus/<SyllabusID>/  -> Update a specific syllabus entry
+    DELETE /syllabus/<SyllabusID>/  -> Delete a specific syllabus entry
+    """
+    try:
+        syllabus = Syllabus.objects.get(SyllabusID=SyllabusID)
+    except Syllabus.DoesNotExist:
+        return Response({'error': 'Syllabus entry not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        serializer = SyllabusSerializer(syllabus)
+        return Response(serializer.data)
+
+    elif request.method == 'PUT':
+        serializer = SyllabusSerializer(syllabus, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'DELETE':
+        syllabus.delete()
+        return Response({'message': 'Syllabus entry deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
