@@ -1,8 +1,8 @@
 from django.shortcuts import render
-from .models import  LoginInfo,Subject,Teacher,Classroom,Student,Attendance,TimeTable,Syllabus,Chapter,Module
+from .models import  LoginInfo,Subject,Teacher,Classroom,Student,Attendance,TimeTable,Syllabus,Chapter,Module,Exam
 from .serializers import  LoginInfoSerializer,SubjectSerializer,TeacherSerializer,ClassroomSerializer, \
                           StudentSerializer,AttendanceSerializer,TimeTableSerializer,SyllabusSerializer, \
-                          ChapterSerializer,ModuleSerializer
+                          ChapterSerializer,ModuleSerializer,ExamSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -588,3 +588,90 @@ def module_detail(request, ModuleID):
     elif request.method == 'DELETE':
         module.delete()
         return Response({'message': 'Module deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
+
+# views for Exam
+# 📌 URL: /exams/
+@api_view(['GET', 'POST'])
+def exam_list(request):
+    """
+    GET  /exams/  -> List all exams with optional filters
+    GET /exams/?StartDate=<StartDate>&EndDate=<EndDate>&ParticularDate=<ParticularDate>&SyllabusID=<SyllabusID>&ChapterID=<ChapterID>&ChapterID=<ChapterID>
+    POST /exams/  -> Create one or more exams at once (bulk)
+    """
+    # Retrieve query parameters
+    start_date = request.GET.get('StartDate')
+    end_date = request.GET.get('EndDate')
+    particular_date = request.GET.get('ParticularDate')
+    syllabus_id = request.GET.get('SyllabusID')
+    chapter_ids = request.GET.getlist('ChapterID')  # Supports multiple chapter IDs
+
+    if request.method == 'GET':
+        exams = Exam.objects.all()
+
+        # Apply filters based on query parameters
+        if start_date:
+            exams = exams.filter(DateOfExam__gte=start_date)  # Filters exams starting from StartDate
+        if end_date:
+            exams = exams.filter(DateOfExam__lte=end_date)  # Filters exams until EndDate
+        if particular_date:
+            exams = exams.filter(DateOfExam=particular_date)  # Filters exams on a specific date
+        if syllabus_id:
+            exams = exams.filter(SyllabusID=syllabus_id)  # Filters exams by SyllabusID
+        if chapter_ids:
+            exams = exams.filter(Chapters__ChapterID__in=chapter_ids)  # Filters exams by multiple ChapterIDs
+
+        serializer = ExamSerializer(exams, many=True)
+        return Response(serializer.data)
+
+    elif request.method == 'POST':
+        # Handle bulk exam creation
+        if isinstance(request.data, list):  
+            for exam_data in request.data:
+                chapter_ids = exam_data.get('Chapters', [])
+                # Convert chapter_ids list to set to avoid duplication
+                chapter_instances = Chapter.objects.filter(ChapterID__in=chapter_ids)
+                exam_data['Chapters'] = chapter_instances  # Attach the chapters properly
+
+            serializer = ExamSerializer(data=request.data, many=True)
+
+        else:  # Handle single exam creation
+            chapter_ids = request.data.get('Chapters', [])
+            chapter_instances = Chapter.objects.filter(ChapterID__in=chapter_ids)
+            request.data['Chapters'] = chapter_instances
+
+            serializer = ExamSerializer(data=request.data)
+
+        if serializer.is_valid():
+            # Save the exam(s) and return the created data
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET', 'PUT', 'DELETE'])
+def exam_detail(request, ExamID):
+    """
+    GET    /exams/<ExamID>/  -> Retrieve a specific exam
+    PUT    /exams/<ExamID>/  -> Update a specific exam
+    DELETE /exams/<ExamID>/  -> Delete a specific exam
+    """
+    try:
+        exam = Exam.objects.get(ExamID=ExamID)
+    except Exam.DoesNotExist:
+        return Response({'error': 'Exam not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        serializer = ExamSerializer(exam)
+        return Response(serializer.data)
+
+    elif request.method == 'PUT':
+        serializer = ExamSerializer(exam, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'DELETE':
+        exam.delete()
+        return Response({'message': 'Exam deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)

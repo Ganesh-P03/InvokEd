@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import  LoginInfo,Subject,Teacher,Classroom,Student,Attendance,TimeTable,Syllabus,Chapter,Module
+from .models import  LoginInfo,Subject,Teacher,Classroom,Student,Attendance,TimeTable,Syllabus,Chapter,Module,Exam
 
 class LoginInfoSerializer(serializers.ModelSerializer):
     class Meta:
@@ -50,3 +50,11 @@ class ModuleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Module
         fields = '__all__'
+
+class ExamSerializer(serializers.ModelSerializer):
+    Chapters = serializers.PrimaryKeyRelatedField(queryset=Chapter.objects.all(), many=True)  # Many-to-many with Chapters
+    
+    class Meta:
+        model = Exam
+        fields = ['ExamID', 'ExamName', 'DateOfExam', 'Chapters', 'SyllabusID']
+

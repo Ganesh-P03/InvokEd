@@ -21,7 +21,8 @@ from apigateway.views import subject_list,subject_detail,teacher_list,teacher_de
                              classroom_list,classroom_detail,student_list,\
                              student_detail,attendance_list,attendance_detail,\
                              timetable_detail,timetable_list,syllabus_detail,syllabus_list, \
-                             chapter_list,chapter_detail,module_list,module_detail
+                             chapter_list,chapter_detail,module_list,module_detail, \
+                             exam_list,exam_detail
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -63,4 +64,8 @@ urlpatterns = [
     #Module URLs
     path('modules/', module_list, name='module-list'),
     path('modules/<str:ModuleID>/', module_detail, name='module-detail'),
+
+    #Exam URLs
+    path('exams/', exam_list, name='exam-list'),
+    path('exams/<str:ExamID>/', exam_detail, name='exam-detail'),
 ]

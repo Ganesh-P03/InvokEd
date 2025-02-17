@@ -82,7 +82,7 @@ class Chapter(models.Model):
     TargetDate = models.DateField()
 
     def __str__(self):
-        return self.ChapterName
+        return self.ChapterID
 
 class Module(models.Model):
     ModuleID = models.CharField(primary_key=True, max_length=100, default=uuid.uuid4)
@@ -94,3 +94,13 @@ class Module(models.Model):
 
     def __str__(self):
         return self.ModuleName
+
+class Exam(models.Model):
+    ExamID = models.CharField(primary_key=True, max_length=100, default=uuid.uuid4)
+    ExamName = models.CharField(max_length=255)
+    DateOfExam = models.DateField()
+    Chapters = models.ManyToManyField('Chapter', blank=True)  # Many-to-many relationship with Chapter
+    SyllabusID = models.ForeignKey('Syllabus', on_delete=models.CASCADE)  # Foreign key to Syllabus
+
+    def __str__(self):
+        return self.ExamName
