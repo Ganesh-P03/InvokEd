@@ -22,3 +22,5 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+server/apigateway/__pycache__
+server/backend/__pycache__
