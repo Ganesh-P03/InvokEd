@@ -2,6 +2,24 @@ import React, { useState } from "react";
 import { TextField, Button, Box, Container, Typography, Paper, Alert } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
+const LoginInfo = [
+  {
+    TID : "T0001",
+    Password: "password",
+    Type: "Teacher"
+  },
+  {
+    TID : "T0002",
+    Password: "password",
+    Type: "Teacher"
+  },
+  {
+    TID : "T0003",
+    Password: "password",
+    Type: "Headmaster"
+  }
+]
+
 const Login = ({ isAuthenticated,setIsAuthenticated }) => {  // Accept setIsAuthenticated as a prop
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -17,11 +35,14 @@ const Login = ({ isAuthenticated,setIsAuthenticated }) => {  // Accept setIsAuth
       return;
     }
 
-    if (trimmedUsername === "admin" && trimmedPassword === "admin") {
+    if (LoginInfo.find((user) => user.TID === trimmedUsername && user.Password === trimmedPassword)) {
+      setIsAuthenticated(true);  // Set isAuthenticated to true
       localStorage.setItem("authenticated", "true");
-      setIsAuthenticated(true);  // Update state in App.jsx
-      navigate("/home");
-    } else {
+      localStorage.setItem("TID", trimmedUsername);
+      localStorage.setItem("Type", LoginInfo.find((user) => user.TID === trimmedUsername).Type);
+      navigate("/home");  // Navigate to home
+    }
+    else {
       setError("Invalid username or password!");
     }
   };
