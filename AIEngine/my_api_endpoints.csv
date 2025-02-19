@@ -1,0 +1,7 @@
+url,Description,variables
+"/students","Get all students in the system","[]"
+"/students/StudentID","Get details of a particular Student given the rollnumber","['StudentID']"
+"/teachers","Get all teachers in the system","[]"
+"/teachers/TID","Get details of a particular Teacher given the rollnumber","['TID']"
+"/classrooms","Get all classrooms in the system","[]"
+"/classrooms/ClassroomID","Get details of a particular Classroom given the classroom name","['ClassroomID']"
