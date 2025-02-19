@@ -24,3 +24,6 @@ dist-ssr
 *.sw?
 server/apigateway/__pycache__
 server/backend/__pycache__
+
+# ChromaDB vector store
+vectorstore/
