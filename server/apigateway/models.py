@@ -50,11 +50,10 @@ class Attendance(models.Model):
         return f"{self.StudentID.Name} - {self.Date} - {'Present' if self.Status == 1 else 'Absent'}"
 
 class Subject(models.Model):
-    SubjectID = models.AutoField(primary_key=True)
-    SubjectName = models.CharField(max_length=255, unique=True)
+    SubjectID = models.CharField(primary_key=True,max_length=255)
 
     def __str__(self):
-        return self.SubjectName
+        return self.SubjectID
 
 class TimeTable(models.Model):
     TimeTableID = models.AutoField(primary_key=True)  # Explicit primary key

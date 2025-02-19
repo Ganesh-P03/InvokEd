@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from apigateway.views import subject_list,subject_detail,teacher_list,teacher_detail,\
+from apigateway.views import subject_list, subject_detail,teacher_list,teacher_detail,\
                              logininfo_list,logininfo_detail,\
                              classroom_list,classroom_detail,student_list,\
                              student_detail,attendance_list,attendance_detail,\
@@ -26,8 +26,6 @@ from apigateway.views import subject_list,subject_detail,teacher_list,teacher_de
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('subjects/', subject_list, name='subject-list'),
-    path('subjects/<int:SubjectID>/', subject_detail, name='subject-detail'),
 
     # LoginInfo URLs
     path('logininfos/', logininfo_list, name='login-list-create'),  # GET, POST
@@ -48,6 +46,10 @@ urlpatterns = [
     # Attendance URLs
     path('attendance/', attendance_list, name='attendance-list'),  # List & Create Attendance (bulk support)
     path('attendance/<int:AttendanceID>/', attendance_detail, name='attendance-detail'),  # Retrieve, Update, Delete
+
+    # Subject URLs
+    path('subjects/', subject_list, name='subject-list'),
+    path('subjects/<str:SubjectID>', subject_detail, name='subject-detail'),
 
     # TimeTable URLs
     path('timetable/', timetable_list, name='timetable-list'),  # List & Create
