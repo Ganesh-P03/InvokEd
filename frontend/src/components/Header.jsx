@@ -13,13 +13,15 @@ const Header = ({ isAuthenticated, setIsAuthenticated }) => { // Accept props
 
   const handleLogout = () => {
     localStorage.removeItem("authenticated");
+    localStorage.removeItem("TID");
+    localStorage.removeItem("Type");
     setIsAuthenticated(false);
     navigate("/");
   };
 
   return (
     isAuthenticated &&  // Render only when authenticated
-    <AppBar position="fixed">
+    <AppBar position="fixed" display="block">
       <Toolbar>
         {/* Home Icon on the Left */}
         <IconButton edge="start" color="inherit" aria-label="home" onClick={handleHomeClick}>
