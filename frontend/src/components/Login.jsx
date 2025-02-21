@@ -20,7 +20,7 @@ const LoginInfo = [
   }
 ]
 
-const Login = ({ isAuthenticated,setIsAuthenticated }) => {  // Accept setIsAuthenticated as a prop
+const Login = ({ isAuthenticated, setIsAuthenticated }) => {  // Accept setIsAuthenticated as a prop
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -40,7 +40,7 @@ const Login = ({ isAuthenticated,setIsAuthenticated }) => {  // Accept setIsAuth
       localStorage.setItem("authenticated", "true");
       localStorage.setItem("TID", trimmedUsername);
       localStorage.setItem("Type", LoginInfo.find((user) => user.TID === trimmedUsername).Type);
-      navigate("/home");  // Navigate to home
+      navigate("/home?TID=" + trimmedUsername+"&Type="+LoginInfo.find((user) => user.TID === trimmedUsername).Type);
     }
     else {
       setError("Invalid username or password!");

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { Box } from "@mui/material";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { Box, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 
 // Classroom data
@@ -11,6 +11,53 @@ const classroomData = [
   { ClassroomID: "8B", ClassTeacherID: "T0006" },
   { ClassroomID: "9A", ClassTeacherID: "T0007" },
   { ClassroomID: "9B", ClassTeacherID: "T0008" },
+  { ClassroomID: "10A", ClassTeacherID: "T0009" },
+  { ClassroomID: "10B", ClassTeacherID: "T0010" },
+];
+
+// Classes handled by different teachers
+const classroomsHandledByTeachers = {
+  "T0001": [
+    { ClassroomID: "6A", ClassTeacherID: "T0001" },
+    { ClassroomID: "7B", ClassTeacherID: "T0004" },
+    { ClassroomID: "8A", ClassTeacherID: "T0005" },
+    { ClassroomID: "9A", ClassTeacherID: "T0007" },
+  ],
+  "T0002": [
+    { ClassroomID: "7A", ClassTeacherID: "T0003" },
+    { ClassroomID: "8B", ClassTeacherID: "T0006" },
+    { ClassroomID: "9B", ClassTeacherID: "T0008" },
+    { ClassroomID: "10A", ClassTeacherID: "T0009" },
+    { ClassroomID: "10B", ClassTeacherID: "T0010" },
+  ],
+  "T0003": classroomData, // Headmaster has access to all classrooms
+};
+
+// Teacher details with required fields
+
+const loggedInTeacherDetails = [
+  { 
+    TID: "T0001", 
+    Name: "Sarah Johnson", 
+    DateofJoining: "2018-08-15", 
+    Phone: "555-123-4567", 
+    SubjectID: "Science" 
+  },
+  { 
+    TID: "T0002", 
+    Name: "Michael Chen", 
+    DateofJoining: "2016-07-20", 
+    Phone: "555-234-5678", 
+    SubjectID: "Mathematics" 
+  },
+  { 
+    TID: "T0003", 
+    Name: "Amelia Patel", 
+    DateofJoining: "2019-01-10", 
+    Phone: "555-345-6789", 
+    SubjectID: "Social" 
+  }
+
 ];
 
 // 🎨 Background colors for each classroom (Google Classroom style)
@@ -156,29 +203,67 @@ const Item = ({ children, onClick, index }) => {
 
 // Home Component
 const Home = () => {
-  const [TID, setTid] = useState(localStorage.getItem("TID"));
-  const [Type, setType] = useState(localStorage.getItem("Type"));
+  const [searchParams] = useSearchParams();
+  const [TID, setTid] = useState("");
+  const [Type, setType] = useState("");
+  const [classrooms, setClassrooms] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-    setTid(localStorage.getItem("TID") || "");
-    setType(localStorage.getItem("Type") || "");
-  }, []);
+    // Get TID and Type from URL params or localStorage
+    const tidFromParams = searchParams.get("TID");
+    const typeFromParams = searchParams.get("Type");
+    
+    const tid = tidFromParams || localStorage.getItem("TID") || "";
+    const type = typeFromParams || localStorage.getItem("Type") || "";
+    
+    setTid(tid);
+    setType(type);
+    
+    // Determine which classrooms to display based on Type
+    if (type === "Headmaster") {
+      setClassrooms(classroomData);
+    } else if (tid && classroomsHandledByTeachers[tid]) {
+      setClassrooms(classroomsHandledByTeachers[tid]);
+    } else {
+      setClassrooms([]);
+    }
+  }, [searchParams]);
+
+  // Function to navigate to classroom with preserved query parameters
+const navigateToClassroom = (classroomID) => {
+  // Find the subject ID for the logged-in teacher
+  const currentTeacher = loggedInTeacherDetails.find(teacher => teacher.TID === TID);
+  const subjectID = currentTeacher ? currentTeacher.SubjectID : "";
+  
+  // Create the URL with preserved query parameters including SubjectID
+  navigate(`/class/${classroomID}?TID=${TID}&Type=${Type}&SubjectID=${subjectID}`);
+};
 
   return (
     <div>
       <Box sx={{ marginTop: "64px", flexGrow: 1, padding: "20px", overflowY: "auto", height: "100vh" }}>
+        <Typography variant="h4" sx={{ mb: 3, textAlign: "center" }}>
+          {Type === "Headmaster" ? "All Classrooms" : "Your Assigned Classrooms"}
+        </Typography>
+        
         <Grid container spacing={2} columns={12} justifyContent="center">
-          {classroomData.map((item, index) => (
+          {classrooms.map((item, index) => (
             <Grid item xs={12} sm={6} md={4} key={item.ClassroomID} display="flex" justifyContent="center">
               <Item
                 index={index}
-                onClick={() => navigate(`/class/${item.ClassroomID}`)}
+                onClick={() => navigateToClassroom(item.ClassroomID)}
               >
                 {item.ClassroomID}
               </Item>
             </Grid>
           ))}
+          
+          {classrooms.length === 0 && (
+            <Typography variant="h6" sx={{ mt: 4, textAlign: "center", width: "100%" }}>
+              No classrooms assigned.
+            </Typography>
+          )}
         </Grid>
       </Box>
     </div>
