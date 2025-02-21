@@ -27,3 +27,5 @@ server/backend/__pycache__
 
 # ChromaDB vector store
 vectorstore/
+
+.env
