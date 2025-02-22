@@ -1,3 +1,5 @@
+// This is Footer.jsx
+
 import React, { useState, useEffect, useRef } from "react";
 import { 
   AppBar, 

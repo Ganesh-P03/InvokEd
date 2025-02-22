@@ -1,4 +1,5 @@
 // This is Class.jsx
+
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { 
@@ -18,6 +19,7 @@ const ClassDetail = () => {
   const [TID, setTID] = useState("");
   const [Type, setType] = useState("");
   const [currentTab, setCurrentTab] = useState(0);
+  const [subjectID, setSubjectID] = useState("");
 
   // Map tab names to their indices
   const tabMapping = {
@@ -37,10 +39,18 @@ const ClassDetail = () => {
     // Get TID, Type, and tab from URL params or localStorage
     const tidFromParams = searchParams.get("TID");
     const typeFromParams = searchParams.get("Type");
+    const subjectIDFromParams = searchParams.get("SubjectID");
     const tabFromParams = searchParams.get("tab");
     
     setTID(tidFromParams || localStorage.getItem("TID") || "");
     setType(typeFromParams || localStorage.getItem("Type") || "");
+    setSubjectID(subjectIDFromParams || "");
+    setCurrentTab(tabMapping[tabFromParams] || 0);
+
+    console.log("TID:", tidFromParams);
+    console.log("Type:", typeFromParams);
+    console.log("SubjectID:", subjectIDFromParams);
+    
     
     // Set current tab based on URL parameter
     if (tabFromParams && tabMapping.hasOwnProperty(tabFromParams)) {
@@ -67,7 +77,7 @@ const ClassDetail = () => {
       </Box>
 
       <Box sx={{ mt: 12, width: '150%', ml: '-25%' }}>
-        {currentTab === 0 && <SyllabusPlanning classroomId={id} TID={TID} />}
+        {currentTab === 0 && <SyllabusPlanning/>}
         {currentTab === 1 && <Attendance />}
         {currentTab === 2 && <PerformanceTracker />}
       </Box>
