@@ -23,9 +23,11 @@ dist-ssr
 *.sln
 *.sw?
 server/apigateway/__pycache__
+server/apigateway/migrations/__pycache__
 server/backend/__pycache__
 
 # ChromaDB vector store
 vectorstore/
 
 .env
+AIEngine/attendance/data/faces_data.pkl
