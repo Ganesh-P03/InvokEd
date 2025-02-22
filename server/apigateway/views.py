@@ -1,4 +1,4 @@
-from django.db.models import Count
+from django.db.models import Count, Avg, Min, Max
 from .models import  LoginInfo,Subject,Teacher,Classroom,Student,Attendance,TimeTable,Syllabus,Chapter,Module,Exam,Marks
 from .serializers import  LoginInfoSerializer,SubjectSerializer,TeacherSerializer,ClassroomSerializer, \
                           StudentSerializer,AttendanceSerializer,TimeTableSerializer,SyllabusSerializer, \
@@ -672,7 +672,47 @@ def exam_list(request):
             exams = exams.filter(Chapters__ChapterID__in=chapter_ids)  # Filters exams by multiple ChapterIDs
 
         serializer = ExamSerializer(exams, many=True)
-        return Response(serializer.data)
+
+        # 📌 Fetch marks data for each exam
+        marks_data = Marks.objects.values('ExamID').annotate(
+            average_marks=Avg('Marks'),
+            highest_marks=Max('Marks'),
+            lowest_marks=Min('Marks')
+        )
+        marks_map = {entry['ExamID']: entry for entry in marks_data}
+
+        # 📌 Fetch all student marks for each exam
+        all_marks_per_exam = {}
+        for mark in Marks.objects.select_related('StudentID', 'ExamID').all():
+            exam_id = mark.ExamID.ExamID
+            student = mark.StudentID
+
+            if exam_id not in all_marks_per_exam:
+                all_marks_per_exam[exam_id] = []
+
+            all_marks_per_exam[exam_id].append({
+                "StudentID": student.StudentID,
+                "StudentName": student.Name,
+                "Marks": mark.Marks
+            })
+
+        # 📌 Append marks data to exam response
+        response_data = []
+        for entry in serializer.data:
+            exam_id = entry["ExamID"]
+            
+            # Convert ChapterIDs to ChapterNames
+            chapters = Chapter.objects.filter(exam__ExamID=exam_id).values_list('ChapterName', flat=True)
+
+            entry["AverageMarks"] = marks_map.get(exam_id, {}).get("average_marks", None)
+            entry["HighestMarks"] = marks_map.get(exam_id, {}).get("highest_marks", None)
+            entry["LowestMarks"] = marks_map.get(exam_id, {}).get("lowest_marks", None)
+            entry["AllMarks"] = all_marks_per_exam.get(exam_id, [])
+            entry["Chapters"] = list(chapters)  # Replace ChapterIDs with ChapterNames
+
+            response_data.append(entry)
+
+        return Response(response_data)
 
     elif request.method == 'POST':
         # Handle bulk exam creation
@@ -708,14 +748,43 @@ def exam_detail(request, ExamID):
     DELETE /exams/<ExamID>/  -> Delete a specific exam
     """
     try:
-        exam = Exam.objects.get(ExamID=ExamID)
+        exam = Exam.objects.prefetch_related('Chapters').get(ExamID=ExamID)
     except Exam.DoesNotExist:
         return Response({'error': 'Exam not found'}, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
         serializer = ExamSerializer(exam)
-        return Response(serializer.data)
 
+        # 📌 Fetch marks statistics
+        marks_data = Marks.objects.filter(ExamID=ExamID).aggregate(
+            average_marks=Avg('Marks'),
+            highest_marks=Max('Marks'),
+            lowest_marks=Min('Marks')
+        )
+
+        # 📌 Fetch all student marks
+        all_marks = Marks.objects.filter(ExamID=ExamID).select_related('StudentID')
+        student_marks = [
+            {
+                "StudentID": mark.StudentID.StudentID,
+                "StudentName": mark.StudentID.Name,
+                "Marks": mark.Marks
+            }
+            for mark in all_marks
+        ]
+
+        # 📌 Convert ChapterIDs to ChapterNames
+        chapters = list(exam.Chapters.values_list('ChapterName', flat=True))
+
+        # 📌 Construct the response
+        response_data = serializer.data
+        response_data["AverageMarks"] = marks_data["average_marks"]
+        response_data["HighestMarks"] = marks_data["highest_marks"]
+        response_data["LowestMarks"] = marks_data["lowest_marks"]
+        response_data["AllMarks"] = student_marks
+        response_data["Chapters"] = chapters  # Replace ChapterIDs with ChapterNames
+
+        return Response(response_data)
     elif request.method == 'PUT':
         serializer = ExamSerializer(exam, data=request.data)
         if serializer.is_valid():
