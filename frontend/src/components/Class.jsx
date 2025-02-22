@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import SyllabusPlanning from './SyllabusPlanning';
 import Attendance from './Attendance';
+import PerformanceTracker from './PerformanceTracker';
 
 const ClassDetail = () => {
   const { id } = useParams();
@@ -68,7 +69,7 @@ const ClassDetail = () => {
       <Box sx={{ mt: 12, width: '150%', ml: '-25%' }}>
         {currentTab === 0 && <SyllabusPlanning classroomId={id} TID={TID} />}
         {currentTab === 1 && <Attendance />}
-        {currentTab === 2 && <Typography>Performance Tracker Content</Typography>}
+        {currentTab === 2 && <PerformanceTracker />}
       </Box>
     </Box>
   );
