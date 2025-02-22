@@ -6,6 +6,8 @@ from .serializers import  LoginInfoSerializer,SubjectSerializer,TeacherSerialize
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
+from datetime import date, timedelta
+from apigateway.syllabus_planning import get_module_completion_map, get_chapter_completion_map
 
 # views for LoginInfo
 # 📌 URL: /logininfos/
@@ -488,12 +490,24 @@ def chapter_list(request):
     syllabus_id = request.GET.get('SyllabusID')
 
     if request.method == 'GET':
+        chapters = Chapter.objects.all()
         if syllabus_id:
-            chapters = Chapter.objects.filter(SyllabusID=syllabus_id)
-        else:
-            chapters = Chapter.objects.all()
-        serializer = ChapterSerializer(chapters, many=True)
-        return Response(serializer.data)
+            chapters = chapters.filter(SyllabusID=syllabus_id)
+
+        chapter_completion_map = get_chapter_completion_map()
+
+        chapter_data = [
+            {
+                "ChapterID": chapter.ChapterID,
+                "ChapterName": chapter.ChapterName,
+                "SyllabusID": chapter.SyllabusID.SyllabusID,
+                "estimated_completion_date": chapter_completion_map.get(chapter.ChapterID),
+                "targetDate": chapter.TargetDate
+            }
+            for chapter in chapters
+        ]
+
+        return Response(chapter_data)
 
     elif request.method == 'POST':
         if isinstance(request.data, list):  # 📌 Handle bulk chapter creation
@@ -544,12 +558,29 @@ def module_list(request):
     chapter_id = request.GET.get('ChapterID')
 
     if request.method == 'GET':
+        modules = Module.objects.all().order_by('-ThisWeek', 'ModuleID')
+
+        # Compute completion dates
+        module_completion_map = get_module_completion_map()
+
+        module_data = [
+            {
+                "ModuleID": module.ModuleID,
+                "ModuleName": module.ModuleName,
+                "RemainingTime": module.RemainingTime,
+                "URL": module.URL,
+                "ThisWeek": module.ThisWeek,
+                "ChapterID": module.ChapterID.ChapterID,
+                "estimated_completion_date": module_completion_map.get(module.ModuleID, date.today())
+            }
+            for module in modules
+        ]
+
+        # Apply ChapterID filter (if given)
         if chapter_id:
-            modules = Module.objects.filter(ChapterID=chapter_id)
-        else:
-            modules = Module.objects.all()
-        serializer = ModuleSerializer(modules, many=True)
-        return Response(serializer.data)
+            module_data = [module for module in module_data if module["ChapterID"] == chapter_id]
+
+        return Response(module_data)
 
     elif request.method == 'POST':
         if isinstance(request.data, list):  # 📌 Handle bulk module creation

@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import  LoginInfo,Subject,Teacher,Classroom,Student,Attendance,TimeTable,Syllabus,Chapter,Module,Exam,Marks
+from datetime import timedelta, date
 
 class LoginInfoSerializer(serializers.ModelSerializer):
     class Meta:
