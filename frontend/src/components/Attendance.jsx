@@ -13,8 +13,10 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Link
+  Link,
+  Chip
 } from '@mui/material';
+import { Warning, Send } from '@mui/icons-material';
 
 const attendanceData = {
   attendance: [
@@ -42,15 +44,21 @@ const attendanceData = {
   ],
 };
 
+
 const Attendance = () => {
-  const navigate = useNavigate();
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
-  const [graphData, setGraphData] = useState([]);
-  const [studentStats, setStudentStats] = useState([]);
+    const navigate = useNavigate();
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
+    const [graphData, setGraphData] = useState([]);
+    const [studentStats, setStudentStats] = useState([]);
 
   const handleStudentClick = (studentId) => {
     navigate(`/student/${studentId}`);
+  };
+
+  const handleSendAlert = (studentId, studentName) => {
+    // Here you can implement the alert sending logic
+    console.log(`Sending alert to ${studentName} (${studentId})`);
   };
 
   const processAttendanceData = () => {
@@ -140,12 +148,12 @@ const Attendance = () => {
   };
 
   return (
-    <Paper elevation={1} sx={{ maxWidth: '1000px', mx: 'auto', p: 4, mb:"105px" }}>
+    <Paper elevation={1} sx={{ maxWidth: '900px', mx: '-100px', p: 4, mb:"105px" }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
         <Typography variant="h5" component="h2" fontWeight="bold">
-          Attendance Report
-        </Typography>
-        <Box sx={{ display: 'flex', gap: 2 }}>
+           Attendance Report
+         </Typography>
+         <Box sx={{ display: 'flex', gap: 2 }}>
           <TextField
             type="date"
             label="Start Date"
@@ -204,38 +212,86 @@ const Attendance = () => {
             <TableRow>
               <TableCell>Student ID</TableCell>
               <TableCell>Student Name</TableCell>
-              <TableCell align="right">Days Present</TableCell>
-              <TableCell align="right">Total Days</TableCell>
-              <TableCell align="right">Attendance %</TableCell>
+              <TableCell align="center">Days Present</TableCell>
+              <TableCell align="center">Total Days</TableCell>
+              <TableCell align="center">Attendance %</TableCell>
+              <TableCell>Status</TableCell>
+              <TableCell align="center">Action</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {studentStats.map((student) => (
-              <TableRow key={student.studentId}>
-                <TableCell>
-                  <Link
-                    component="button"
-                    variant="body2"
-                    onClick={() => handleStudentClick(student.studentId)}
-                    sx={{ 
-                      textDecoration: 'none',
-                      '&:hover': {
-                        textDecoration: 'underline',
-                        cursor: 'pointer'
-                      }
-                    }}
-                  >
-                    {student.studentId}
-                  </Link>
-                </TableCell>
-                <TableCell>{student.studentName}</TableCell>
-                <TableCell align="right">{student.daysPresent}</TableCell>
-                <TableCell align="right">{student.totalDays}</TableCell>
-                <TableCell align="right">
-                  {((student.daysPresent / student.totalDays) * 100).toFixed(1)}%
-                </TableCell>
-              </TableRow>
-            ))}
+            {studentStats.map((student) => {
+              const attendancePercentage = (student.daysPresent / student.totalDays) * 100;
+              const isLowAttendance = attendancePercentage < 70;
+
+              return (
+                <TableRow 
+                  key={student.studentId}
+                  sx={{
+                    backgroundColor: isLowAttendance ? '#fff4f4' : 'inherit',
+                  }}
+                >
+                  <TableCell>
+                    <Link
+                      component="button"
+                      variant="body2"
+                      onClick={() => handleStudentClick(student.studentId)}
+                      sx={{ 
+                        textDecoration: 'none',
+                        '&:hover': {
+                          textDecoration: 'underline',
+                          cursor: 'pointer'
+                        }
+                      }}
+                    >
+                      {student.studentId}
+                    </Link>
+                  </TableCell>
+                  <TableCell>{student.studentName}</TableCell>
+                  <TableCell align="center">{student.daysPresent}</TableCell>
+                  <TableCell align="center">{student.totalDays}</TableCell>
+                  <TableCell align="center">
+                    <Box 
+                      component="span" 
+                      sx={{ 
+                        color: isLowAttendance ? 'error.main' : 'inherit',
+                        fontWeight: isLowAttendance ? 'bold' : 'regular'
+                      }}
+                    >
+                      {attendancePercentage.toFixed(1)}%
+                    </Box>
+                  </TableCell>
+                  <TableCell>
+                    {isLowAttendance && (
+                      <Chip
+                        icon={<Warning />}
+                        label="Low Attendance"
+                        color="error"
+                        size="small"
+                        sx={{ fontWeight: 'medium' }}
+                      />
+                    )}
+                  </TableCell>
+                  <TableCell align="center">
+                    {isLowAttendance && (
+                      <Button
+                        variant="contained"
+                        color="error"
+                        size="small"
+                        startIcon={<Send />}
+                        onClick={() => handleSendAlert(student.studentId, student.studentName)}
+                        sx={{
+                          textTransform: 'none',
+                          minWidth: '120px'
+                        }}
+                      >
+                        Send Alert
+                      </Button>
+                    )}
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </TableContainer>
