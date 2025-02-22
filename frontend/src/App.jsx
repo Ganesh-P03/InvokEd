@@ -1,5 +1,7 @@
+// This is App.jsx
+
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useSearchParams } from "react-router-dom";
 import Login from "./components/Login";
 import Home from "./components/Home";
 import Class from "./components/Class";
@@ -21,6 +23,21 @@ const App = () => {
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
+  // Wrapper component to handle default tab
+  const ClassWithDefaultTab = () => {
+    const [searchParams, setSearchParams] = useSearchParams();
+    
+    useEffect(() => {
+      if (!searchParams.get('tab')) {
+        const newParams = new URLSearchParams(searchParams);
+        newParams.set('tab', 'syllabus');
+        setSearchParams(newParams);
+      }
+    }, [searchParams, setSearchParams]);
+
+    return <Class />;
+  };
+
   return (
     <Router>
       <Header isAuthenticated={isAuthenticated} setIsAuthenticated={setIsAuthenticated} />
@@ -30,7 +47,9 @@ const App = () => {
           path="/home" 
           element={isAuthenticated ? <Home /> : <Navigate to="/" />} 
         />
-        <Route path="/class/:id" element={isAuthenticated ? <Class /> : <Navigate to="/" />}
+        <Route 
+          path="/class/:id" 
+          element={isAuthenticated ? <ClassWithDefaultTab /> : <Navigate to="/" />}
         />
       </Routes>
       <Footer isAuthenticated={isAuthenticated} setIsAuthenticated={setIsAuthenticated} />

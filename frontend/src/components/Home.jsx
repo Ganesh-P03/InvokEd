@@ -1,3 +1,5 @@
+// This is Home.jsx
+
 import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Box, Typography } from "@mui/material";
@@ -5,57 +7,58 @@ import Grid from "@mui/material/Grid2";
 
 // Classroom data
 const classroomData = [
-  { ClassroomID: "6A", ClassTeacherID: "T0001" },
-  { ClassroomID: "7A", ClassTeacherID: "T0003" },
-  { ClassroomID: "8A", ClassTeacherID: "T0005" },
-  { ClassroomID: "8B", ClassTeacherID: "T0006" },
-  { ClassroomID: "9A", ClassTeacherID: "T0007" },
-  { ClassroomID: "9B", ClassTeacherID: "T0008" },
-  { ClassroomID: "10A", ClassTeacherID: "T0009" },
-  { ClassroomID: "10B", ClassTeacherID: "T0010" },
+  { ClassroomID: "6A", ClassTeacherID: "T001" },
+  { ClassroomID: "7A", ClassTeacherID: "T003" },
+  { ClassroomID: "8A", ClassTeacherID: "T005" },
+  { ClassroomID: "8B", ClassTeacherID: "T006" },
+  { ClassroomID: "9A", ClassTeacherID: "T007" },
+  { ClassroomID: "9B", ClassTeacherID: "T008" },
+  { ClassroomID: "10A", ClassTeacherID: "T009" },
+  { ClassroomID: "10B", ClassTeacherID: "T010" },
 ];
 
 // Classes handled by different teachers
 const classroomsHandledByTeachers = {
-  "T0001": [
-    { ClassroomID: "6A", ClassTeacherID: "T0001" },
-    { ClassroomID: "7B", ClassTeacherID: "T0004" },
-    { ClassroomID: "8A", ClassTeacherID: "T0005" },
-    { ClassroomID: "9A", ClassTeacherID: "T0007" },
+  "T001": [
+    { ClassroomID: "6A", ClassTeacherID: "T001" },
+    { ClassroomID: "7A", ClassTeacherID: "T003" },
+    { ClassroomID: "7B", ClassTeacherID: "T004" },
+    { ClassroomID: "8A", ClassTeacherID: "T005" },
+    { ClassroomID: "9A", ClassTeacherID: "T007" },
   ],
-  "T0002": [
-    { ClassroomID: "7A", ClassTeacherID: "T0003" },
-    { ClassroomID: "8B", ClassTeacherID: "T0006" },
-    { ClassroomID: "9B", ClassTeacherID: "T0008" },
-    { ClassroomID: "10A", ClassTeacherID: "T0009" },
-    { ClassroomID: "10B", ClassTeacherID: "T0010" },
+  "T002": [
+    { ClassroomID: "7A", ClassTeacherID: "T003" },
+    { ClassroomID: "8B", ClassTeacherID: "T006" },
+    { ClassroomID: "9B", ClassTeacherID: "T008" },
+    { ClassroomID: "10A", ClassTeacherID: "T009" },
+    { ClassroomID: "10B", ClassTeacherID: "T010" },
   ],
-  "T0003": classroomData, // Headmaster has access to all classrooms
+  "T003": classroomData, // Headmaster has access to all classrooms
 };
 
 // Teacher details with required fields
 
 const loggedInTeacherDetails = [
   { 
-    TID: "T0001", 
+    TID: "T001", 
     Name: "Sarah Johnson", 
     DateofJoining: "2018-08-15", 
     Phone: "555-123-4567", 
-    SubjectID: "Science" 
-  },
-  { 
-    TID: "T0002", 
-    Name: "Michael Chen", 
-    DateofJoining: "2016-07-20", 
-    Phone: "555-234-5678", 
     SubjectID: "Mathematics" 
   },
   { 
-    TID: "T0003", 
+    TID: "T002", 
+    Name: "Michael Chen", 
+    DateofJoining: "2016-07-20", 
+    Phone: "555-234-5678", 
+    SubjectID: "Social" 
+  },
+  { 
+    TID: "T003", 
     Name: "Amelia Patel", 
     DateofJoining: "2019-01-10", 
     Phone: "555-345-6789", 
-    SubjectID: "Social" 
+    SubjectID: "Science" 
   }
 
 ];

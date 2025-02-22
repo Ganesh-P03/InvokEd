@@ -185,7 +185,7 @@ const Footer = ({ isAuthenticated, setIsAuthenticated }) => {
           <DialogTitle id="speech-dialog-title">Confirm Speech Text</DialogTitle>
           <DialogContent>
             <DialogContentText id="speech-dialog-description">
-              Is this what you wanted to say?
+              Is this what you wanted to ask?
             </DialogContentText>
             <Typography 
               variant="body1" 

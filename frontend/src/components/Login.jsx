@@ -1,21 +1,23 @@
+// This is Login.jsx
+
 import React, { useState } from "react";
 import { TextField, Button, Box, Container, Typography, Paper, Alert } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 const LoginInfo = [
   {
-    TID : "T0001",
-    Password: "password",
+    TID : "T001",
+    Password: "123",
     Type: "Teacher"
   },
   {
-    TID : "T0002",
-    Password: "password",
+    TID : "T002",
+    Password: "123",
     Type: "Teacher"
   },
   {
-    TID : "T0003",
-    Password: "password",
+    TID : "T003",
+    Password: "123",
     Type: "Headmaster"
   }
 ]
