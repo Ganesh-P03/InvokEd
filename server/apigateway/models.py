@@ -66,10 +66,14 @@ class TimeTable(models.Model):
         return f"{self.CID} - {self.Day} - Slot {self.Slot}"
 
 class Syllabus(models.Model):
-    SyllabusID = models.CharField(primary_key=True, max_length=100, default=uuid.uuid4)
+    SyllabusID = models.CharField(primary_key=True, max_length=255, editable=False)  # Auto-generated
     ClassroomID = models.ForeignKey('Classroom', on_delete=models.CASCADE)
     SubjectID = models.ForeignKey('Subject', on_delete=models.CASCADE)
     TeacherID = models.ForeignKey('Teacher', on_delete=models.CASCADE)
+
+    def save(self, *args, **kwargs):
+        self.SyllabusID = f"{self.ClassroomID.ClassroomID}_{self.SubjectID.SubjectID}"
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Syllabus for {self.ClassroomID} - {self.SubjectID}"
