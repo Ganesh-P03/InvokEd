@@ -246,7 +246,7 @@ const navigateToClassroom = (classroomID) => {
   return (
     <div>
       <Box sx={{ marginTop: "64px", flexGrow: 1, padding: "20px", overflowY: "auto", height: "100vh" }}>
-        <Typography variant="h4" sx={{ mb: 3, textAlign: "center" }}>
+        <Typography variant="h4" sx={{ mb: 3, textAlign: "center", color: "#333" }}>
           {Type === "Headmaster" ? "All Classrooms" : "Your Assigned Classrooms"}
         </Typography>
         

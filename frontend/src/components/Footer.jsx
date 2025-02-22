@@ -138,7 +138,7 @@ const Footer = ({ isAuthenticated, setIsAuthenticated }) => {
       <>
         <AppBar position="fixed" sx={{ top: "auto", bottom: 0 }}>
           <Toolbar>
-            <Typography variant="body1" sx={{ flexGrow: 1 }}>
+            <Typography variant="heading1" sx={{ flexGrow: 1, fontSize: '1.2rem' }}>
               You are logged in as {localStorage.getItem("TID")}
             </Typography>
             

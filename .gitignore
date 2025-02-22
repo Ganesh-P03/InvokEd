@@ -31,3 +31,5 @@ vectorstore/
 
 .env
 AIEngine/attendance/data/faces_data.pkl
+frontend/src/assets/Attendance.json
+frontend/src/assets/Syllabus.json
