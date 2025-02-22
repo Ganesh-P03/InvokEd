@@ -29,3 +29,5 @@ server/backend/__pycache__
 vectorstore/
 
 .env
+frontend/src/assets/Attendance.json
+frontend/src/assets/Syllabus.json
