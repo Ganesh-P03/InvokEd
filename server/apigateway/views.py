@@ -293,6 +293,7 @@ def attendance_list(request):
     GET  /attendance/?ClassroomID=10&StartDate=2025-02-01&EndDate=2025-02-15  -> Get attendance for a class
     POST /attendance/  -> Create one or multiple attendance records
     """
+    print("here")
     if request.method == 'GET':
         student_id = request.GET.get('StudentId')
         classroom_id = request.GET.get('ClassroomID')
@@ -319,6 +320,7 @@ def attendance_list(request):
         return Response(serializer.data)
 
     elif request.method == 'POST':
+        print("inside post", request.data)
         if isinstance(request.data, list):
             serializer = AttendanceSerializer(data=request.data, many=True)
         else:
