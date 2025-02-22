@@ -29,11 +29,11 @@ urlpatterns = [
 
     # LoginInfo URLs
     path('logininfos/', logininfo_list, name='login-list-create'),  # GET, POST
-    path('logininfos/<str:TID>/', logininfo_detail, name='login-detail'),  # GET, PUT, DELETE
+    path('logininfos/<str:TeacherID>/', logininfo_detail, name='login-detail'),  # GET, PUT, DELETE
 
     # Teacher URLs
     path('teachers/', teacher_list, name='teacher-list-create'),  # GET, POST
-    path('teachers/<str:TID>/', teacher_detail, name='teacher-detail'),  # GET, PUT, DELETE
+    path('teachers/<str:TeacherID>/', teacher_detail, name='teacher-detail'),  # GET, PUT, DELETE
 
     # Student URLs
     path('students/', student_list, name='student-list'),  # List & Create Students

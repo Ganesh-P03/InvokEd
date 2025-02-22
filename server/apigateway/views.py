@@ -24,13 +24,13 @@ def logininfo_list(request):
 
     elif request.method == 'POST':
         data = request.data
-        TID = data.get('TID')
+        TeacherID = data.get('TeacherID')
 
-        if not TID:
-            return Response({'error': 'TID is required'}, status=status.HTTP_400_BAD_REQUEST)
+        if not TeacherID:
+            return Response({'error': 'TeacherID is required'}, status=status.HTTP_400_BAD_REQUEST)
 
         teacher, created = Teacher.objects.get_or_create(
-            TID=TID,
+            TeacherID=TeacherID,
             defaults={
                 "Name": data.get("Name", "Unknown"),
                 "DateofJoining": data.get("DateofJoining", None),
@@ -45,16 +45,16 @@ def logininfo_list(request):
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-# 📌 URL: /logininfos/<TID>/
+# 📌 URL: /logininfos/<TeacherID>/
 @api_view(['GET', 'PUT', 'DELETE'])
-def logininfo_detail(request, TID):
+def logininfo_detail(request, TeacherID):
     """
-    GET    /logins/<TID>/  -> Retrieve login info by TID  
-    PUT    /logins/<TID>/  -> Update login details  
-    DELETE /logins/<TID>/  -> Remove login record  
+    GET    /logins/<TeacherID>/  -> Retrieve login info by TeacherID  
+    PUT    /logins/<TeacherID>/  -> Update login details  
+    DELETE /logins/<TeacherID>/  -> Remove login record  
     """
     try:
-        login = LoginInfo.objects.get(TID=TID)
+        login = LoginInfo.objects.get(TeacherID=TeacherID)
     except LoginInfo.DoesNotExist:
         return Response({'error': 'Login not found'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -98,16 +98,16 @@ def teacher_list(request):
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# 📌 URL: /teachers/<TID>/
+# 📌 URL: /teachers/<TeacherID>/
 @api_view(['GET', 'PUT', 'DELETE'])
-def teacher_detail(request, TID):
+def teacher_detail(request, TeacherID):
     """
-    GET    /teachers/<TID>/  -> Retrieve a teacher by TID  
-    PUT    /teachers/<TID>/  -> Update teacher details  
-    DELETE /teachers/<TID>/  -> Remove a teacher  
+    GET    /teachers/<TeacherID>/  -> Retrieve a teacher by TeacherID  
+    PUT    /teachers/<TeacherID>/  -> Update teacher details  
+    DELETE /teachers/<TeacherID>/  -> Remove a teacher  
     """
     try:
-        teacher = Teacher.objects.get(TID=TID)
+        teacher = Teacher.objects.get(TeacherID=TeacherID)
     except Teacher.DoesNotExist:
         return Response({'error': 'Teacher not found'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -290,10 +290,12 @@ def subject_detail(request, SubjectID):
 def attendance_list(request):
     """
     GET  /attendance/?StudentId=1&StartDate=2025-02-01&EndDate=2025-02-15  -> Get all attendance data (with optional filters)
+    GET  /attendance/?ClassroomID=10&StartDate=2025-02-01&EndDate=2025-02-15  -> Get attendance for a class
     POST /attendance/  -> Create one or multiple attendance records
     """
     if request.method == 'GET':
         student_id = request.GET.get('StudentId')
+        classroom_id = request.GET.get('ClassroomID')
         start_date = request.GET.get('StartDate')
         end_date = request.GET.get('EndDate')
 
@@ -301,11 +303,16 @@ def attendance_list(request):
 
         if student_id:
             attendance = attendance.filter(StudentID=student_id)
+        elif classroom_id:
+            # Get all students in the given classroom
+            student_ids = Student.objects.filter(ClassroomID=classroom_id).values_list('StudentID', flat=True)
+            attendance = attendance.filter(StudentID__in=student_ids)
+
         if start_date and end_date:
             attendance = attendance.filter(Date__range=[start_date, end_date])
-        elif start_date:  # If only start date is given, fetch from that date onwards
+        elif start_date:
             attendance = attendance.filter(Date__gte=start_date)
-        elif end_date:  # If only end date is given, fetch up to that date
+        elif end_date:
             attendance = attendance.filter(Date__lte=end_date)
 
         serializer = AttendanceSerializer(attendance, many=True)
@@ -421,13 +428,13 @@ def timetable_detail(request, TimeTableID):
 @api_view(['GET', 'POST'])
 def syllabus_list(request):
     """
-    GET  /syllabus/?ClassroomID=<ClassroomID>&SubjectID=<SubjectID>&TID=<TID>  
+    GET  /syllabus/?ClassroomID=<ClassroomID>&SubjectID=<SubjectID>&TeacherID=<TeacherID>  
     POST /syllabus/  -> Create a new syllabus (single or bulk)
     """
     if request.method == 'GET':
         classroom_id = request.GET.get('ClassroomID')
         subject_id = request.GET.get('SubjectID')
-        teacher_id = request.GET.get('TID')
+        teacher_id = request.GET.get('TeacherID')
 
         filters = {}
         if classroom_id:
@@ -435,7 +442,7 @@ def syllabus_list(request):
         if subject_id:
             filters['SubjectID'] = subject_id
         if teacher_id:
-            filters['TID'] = teacher_id
+            filters['TeacherID'] = teacher_id
 
         syllabus = Syllabus.objects.filter(**filters)
         serializer = SyllabusSerializer(syllabus, many=True)

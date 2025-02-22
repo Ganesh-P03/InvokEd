@@ -2,20 +2,20 @@ import uuid
 from django.db import models
 
 class LoginInfo(models.Model):
-    TID = models.OneToOneField('Teacher', on_delete=models.CASCADE, primary_key=True)
+    TeacherID = models.OneToOneField('Teacher', on_delete=models.CASCADE, primary_key=True)
     Password = models.CharField(max_length=255)
     Type = models.IntegerField(default=0) #0->teacher,1->admin,2->student
     def __str__(self):
-        return self.TID
+        return self.TeacherID
 
 class Teacher(models.Model):
-    TID = models.CharField(primary_key=True, max_length=100,  default=uuid.uuid4)
+    TeacherID = models.CharField(primary_key=True, max_length=100,  default=uuid.uuid4)
     Name = models.CharField(max_length=255)
     DateofJoining = models.DateField()
     Phone = models.CharField(max_length=15, unique=True)
     SubjectID = models.ForeignKey('Subject', on_delete=models.CASCADE)
     def __str__(self):
-        return self.TID
+        return self.TeacherID
 
 class Student(models.Model):
     StudentID = models.CharField(primary_key=True, max_length=100, default=uuid.uuid4)
@@ -69,7 +69,7 @@ class Syllabus(models.Model):
     SyllabusID = models.CharField(primary_key=True, max_length=100, default=uuid.uuid4)
     ClassroomID = models.ForeignKey('Classroom', on_delete=models.CASCADE)
     SubjectID = models.ForeignKey('Subject', on_delete=models.CASCADE)
-    TID = models.ForeignKey('Teacher', on_delete=models.CASCADE)
+    TeacherID = models.ForeignKey('Teacher', on_delete=models.CASCADE)
 
     def __str__(self):
         return f"Syllabus for {self.ClassroomID} - {self.SubjectID}"
