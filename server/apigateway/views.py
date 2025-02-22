@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.db.models import Count
 from .models import  LoginInfo,Subject,Teacher,Classroom,Student,Attendance,TimeTable,Syllabus,Chapter,Module,Exam,Marks
 from .serializers import  LoginInfoSerializer,SubjectSerializer,TeacherSerializer,ClassroomSerializer, \
                           StudentSerializer,AttendanceSerializer,TimeTableSerializer,SyllabusSerializer, \
@@ -446,7 +446,18 @@ def syllabus_list(request):
 
         syllabus = Syllabus.objects.filter(**filters)
         serializer = SyllabusSerializer(syllabus, many=True)
-        return Response(serializer.data)
+        # 📌 Get student counts for each classroom
+        classroom_counts = Student.objects.values('ClassroomID').annotate(count=Count('StudentID'))
+        student_count_map = {entry['ClassroomID']: entry['count'] for entry in classroom_counts}
+
+        # 📌 Add classroom strength to each syllabus entry
+        response_data = []
+        for entry in serializer.data:
+            classroom_id = entry["ClassroomID"]
+            entry["ClassroomStrength"] = student_count_map.get(classroom_id, 0)  # Default to 0 if no students
+            response_data.append(entry)
+
+        return Response(response_data)
 
     elif request.method == 'POST':
         if isinstance(request.data, list):  # 📌 Handle bulk syllabus creation
