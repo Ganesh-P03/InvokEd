@@ -1,8 +1,9 @@
 // This is Attendance.jsx
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList } from 'recharts';
+import { attendanceService } from '../services/api';
 import { 
   TextField, 
   Button, 
@@ -16,72 +17,63 @@ import {
   TableHead,
   TableRow,
   Link,
-  Chip
+  Chip,
+  Alert,
+  CircularProgress
 } from '@mui/material';
 import { Warning, Send } from '@mui/icons-material';
 
-const attendanceData = {
-  attendance: [
-    { AttendanceID: 1, Date: '2025-02-13', Status: 1, StudentID: 'S001', StudentName: 'John' },
-    { AttendanceID: 2, Date: '2025-02-13', Status: 1, StudentID: 'S002', StudentName: 'Alice' },
-    { AttendanceID: 3, Date: '2025-02-13', Status: 0, StudentID: 'S003', StudentName: 'Bob' },
-    { AttendanceID: 4, Date: '2025-02-14', Status: 1, StudentID: 'S001', StudentName: 'John' },
-    { AttendanceID: 21, Date: '2025-02-14', Status: 1, StudentID: 'S004', StudentName: 'Ram' },
-    { AttendanceID: 5, Date: '2025-02-14', Status: 1, StudentID: 'S002', StudentName: 'Alice' },
-    { AttendanceID: 6, Date: '2025-02-14', Status: 1, StudentID: 'S003', StudentName: 'Bob' },
-    { AttendanceID: 7, Date: '2025-02-15', Status: 0, StudentID: 'S001', StudentName: 'John' },
-    { AttendanceID: 8, Date: '2025-02-15', Status: 1, StudentID: 'S002', StudentName: 'Alice' },
-    { AttendanceID: 9, Date: '2025-02-15', Status: 1, StudentID: 'S003', StudentName: 'Bob' },
-    { AttendanceID: 10, Date: '2025-02-16', Status: 1, StudentID: 'S001', StudentName: 'John' },
-    { AttendanceID: 11, Date: '2025-02-16', Status: 1, StudentID: 'S002', StudentName: 'Alice' },
-    { AttendanceID: 12, Date: '2025-02-16', Status: 1, StudentID: 'S003', StudentName: 'Bob' },
-    { AttendanceID: 13, Date: '2025-02-17', Status: 1, StudentID: 'S001', StudentName: 'John' },
-    { AttendanceID: 14, Date: '2025-02-17', Status: 0, StudentID: 'S002', StudentName: 'Alice' },
-    { AttendanceID: 15, Date: '2025-02-17', Status: 1, StudentID: 'S003', StudentName: 'Bob' },
-    { AttendanceID: 16, Date: '2025-02-18', Status: 1, StudentID: 'S001', StudentName: 'John' },
-    { AttendanceID: 17, Date: '2025-02-18', Status: 1, StudentID: 'S002', StudentName: 'Alice' },
-    { AttendanceID: 18, Date: '2025-02-18', Status: 0, StudentID: 'S003', StudentName: 'Bob' },
-    { AttendanceID: 19, Date: '2025-02-19', Status: 1, StudentID: 'S001', StudentName: 'John' },
-    { AttendanceID: 20, Date: '2025-02-19', Status: 1, StudentID: 'S002', StudentName: 'Alice' },
-  ],
-};
-
-
 const Attendance = () => {
-    const navigate = useNavigate();
-    const [startDate, setStartDate] = useState('');
-    const [endDate, setEndDate] = useState('');
-    const [graphData, setGraphData] = useState([]);
-    const [studentStats, setStudentStats] = useState([]);
+  const navigate = useNavigate();
+  const { id } = useParams(); // Get classroomId from URL
+  console.log("ClassID: "+id);
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [graphData, setGraphData] = useState([]);
+  const [studentStats, setStudentStats] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [attendanceData, setAttendanceData] = useState([]);
+
+  const fetchAttendanceData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await attendanceService.getAttendance(
+        id,
+        startDate || null,
+        endDate || null
+      );
+      setAttendanceData(response);
+      processAttendanceData(response);
+    } catch (err) {
+      setError('Failed to fetch attendance data. Please try again later.');
+      console.error('Error fetching attendance:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleStudentClick = (studentId) => {
     navigate(`/student/${studentId}`);
   };
 
-  const handleSendAlert = (studentId, studentName) => {
-    // Here you can implement the alert sending logic
-    console.log(`Sending alert to ${studentName} (${studentId})`);
+  const handleSendAlert = async (studentId, studentName) => {
+    try {
+      // Implement your alert sending logic here using an API call
+      console.log(`Sending alert to ${studentName} (${studentId})`);
+      // You might want to add an API endpoint for sending alerts
+    } catch (err) {
+      console.error('Error sending alert:', err);
+    }
   };
 
-  const processAttendanceData = () => {
+  const processAttendanceData = (data) => {
     // Process data for graph
     const attendanceByDate = {};
-    let filteredAttendance = [...attendanceData.attendance];
 
-    // Filter attendance records by date range
-    if (startDate.trim() !== '') {
-      filteredAttendance = filteredAttendance.filter(
-        (record) => new Date(record.Date) >= new Date(startDate)
-      );
-    }
-    if (endDate.trim() !== '') {
-      filteredAttendance = filteredAttendance.filter(
-        (record) => new Date(record.Date) <= new Date(endDate)
-      );
-    }
-
-    // Process data for graph
-    filteredAttendance.forEach((record) => {
+    // Group attendance by date
+    data.forEach((record) => {
       const date = record.Date;
       if (!attendanceByDate[date]) {
         attendanceByDate[date] = {
@@ -97,25 +89,27 @@ const Attendance = () => {
       }
     });
 
+    // Calculate percentages
     Object.values(attendanceByDate).forEach((dayData) => {
       dayData.presentPercentage = (dayData.presentCount / dayData.totalStudents) * 100;
     });
 
+    // Sort by date
     const graphDataArray = Object.values(attendanceByDate).sort(
       (a, b) => new Date(a.date) - new Date(b.date)
     );
     setGraphData(graphDataArray);
 
-    // Process data for student statistics table
+    // Process student statistics
     const studentAttendance = {};
-    const uniqueDates = new Set(filteredAttendance.map(record => record.Date));
+    const uniqueDates = new Set(data.map(record => record.Date));
     const totalDays = uniqueDates.size;
 
-    filteredAttendance.forEach((record) => {
+    data.forEach((record) => {
       if (!studentAttendance[record.StudentID]) {
         studentAttendance[record.StudentID] = {
           studentId: record.StudentID,
-          studentName: record.StudentName,
+          studentName: record.StudentID, // You might want to add student names to the API response
           daysPresent: 0,
           totalDays,
         };
@@ -130,8 +124,8 @@ const Attendance = () => {
   };
 
   useEffect(() => {
-    processAttendanceData();
-  }, []);
+    fetchAttendanceData();
+  }, [id]); // Fetch when classroomId changes
 
   const formatDate = (dateStr) => {
     return new Date(dateStr).toLocaleDateString('en-US', {
@@ -149,13 +143,27 @@ const Attendance = () => {
     );
   };
 
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
+        <CircularProgress />
+      </Box>
+    );
+  }
+
   return (
-    <Paper elevation={1} sx={{ maxWidth: '900px', mx: '-100px', p: 4, mb:"105px" }}>
+    <Paper elevation={1} sx={{ maxWidth: '900px', mx: '-100px', p: 4, mb: "105px" }}>
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      )}
+
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
         <Typography variant="h5" component="h2" fontWeight="bold">
-           Attendance Report
-         </Typography>
-         <Box sx={{ display: 'flex', gap: 2 }}>
+          Attendance Report
+        </Typography>
+        <Box sx={{ display: 'flex', gap: 2 }}>
           <TextField
             type="date"
             label="Start Date"
@@ -174,7 +182,7 @@ const Attendance = () => {
           />
           <Button 
             variant="contained" 
-            onClick={processAttendanceData}
+            onClick={fetchAttendanceData}
             sx={{ height: 40 }}
           >
             Submit
@@ -182,28 +190,36 @@ const Attendance = () => {
         </Box>
       </Box>
 
-      <Box sx={{ height: 400, mb: 4 }}>
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={graphData} margin={{ top: 30, right: 30, left: 20, bottom: 30 }}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="date" tickFormatter={formatDate} />
-            <YAxis domain={[0, 100]} />
-            <Tooltip />
-            <Line 
-              type="monotone" 
-              dataKey="presentPercentage" 
-              stroke="#2563eb" 
-              strokeWidth={2}
-            >
-              <LabelList 
-                content={<CustomLabel />}
-                dataKey="presentCount"
-                position="top"
-              />
-            </Line>
-          </LineChart>
-        </ResponsiveContainer>
-      </Box>
+      {graphData.length > 0 ? (
+        <Box sx={{ height: 400, mb: 4 }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={graphData} margin={{ top: 30, right: 30, left: 20, bottom: 30 }}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="date" tickFormatter={formatDate} />
+              <YAxis domain={[0, 100]} />
+              <Tooltip />
+              <Line 
+                type="monotone" 
+                dataKey="presentPercentage" 
+                stroke="#2563eb" 
+                strokeWidth={2}
+              >
+                <LabelList 
+                  content={<CustomLabel />}
+                  dataKey="presentCount"
+                  position="top"
+                />
+              </Line>
+            </LineChart>
+          </ResponsiveContainer>
+        </Box>
+      ) : (
+        <Box sx={{ textAlign: 'center', py: 4 }}>
+          <Typography color="text.secondary">
+            No attendance data available for the selected date range
+          </Typography>
+        </Box>
+      )}
 
       <TableContainer component={Paper} elevation={0} sx={{ mt: 4 }}>
         <Typography variant="h6" component="h3" sx={{ mb: 2 }}>
