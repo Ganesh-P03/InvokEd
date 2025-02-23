@@ -99,11 +99,35 @@ const Footer = ({ isAuthenticated }) => {
     }
   };
 
+  const speak = (text) => {
+    const synth = window.speechSynthesis;
+    const utterance = new SpeechSynthesisUtterance(text);
+  
+    // Fetch available voices
+    const voices = synth.getVoices();
+    
+    // Select a female voice (adjust index based on available voices)
+    const femaleVoice = voices.find(voice => voice.name.includes("Female") || voice.name.includes("Google UK English Female") || voice.name.includes("Microsoft Zira"));
+  
+    if (femaleVoice) {
+      utterance.voice = femaleVoice;
+    }
+  
+    utterance.lang = "en-US"; // Set language
+    utterance.rate = 1; // Adjust speed
+    utterance.volume = 1; // Full volume
+  
+    synth.speak(utterance);
+  };
+  
+  
   const handleConfirm = async () => {
+    speak("Sure, let me show you the details");
+  
     try {
       const response = await queryService.sendQuery(finalTranscript);
       console.log("AI Engine Response:", response);
-
+  
       if (response.isFrontend) {
         navigate(response.url); // Navigate to frontend URL
       } else {
@@ -114,11 +138,12 @@ const Footer = ({ isAuthenticated }) => {
       console.error("Error fetching AI response:", error);
       alert("An error occurred while processing your request.");
     }
-
+  
     setOpenDialog(false);
     setTranscript("");
     setFinalTranscript("");
   };
+  
 
   const handleCancel = () => {
     setOpenDialog(false);

@@ -19,6 +19,7 @@ import {
   Alert,
   CircularProgress
 } from '@mui/material';
+import InsightsPanel from './InsightsPanel';
 
 const Student = () => {
   const { studentId } = useParams();
@@ -154,13 +155,15 @@ const Student = () => {
 
 
   return (
+    <div style={{"display":"flex"}}>
     <Paper elevation={1} sx={{ 
         minWidth: '900px', 
         position: 'relative',
-        left: '-188px',
         p: 4, 
+        ml: "-50px",
         mb: "105px", 
-        mt: "50px" 
+        mt: "50px" ,
+        mr: "50px"
       }}>
       <Typography variant="h5" component="h2" fontWeight="bold" gutterBottom>
         Student Profile
@@ -328,6 +331,11 @@ const Student = () => {
         </Box>
       </Box>
     </Paper>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '50px', marginTop:"50px" }}>
+    <InsightsPanel data={attendanceData}/>
+    <InsightsPanel data={performanceData} />
+    </div>
+    </div>
   );
 };
 

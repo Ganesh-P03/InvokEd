@@ -14,7 +14,17 @@ export const queryService = {
       console.error("Error sending query:", error);
       throw error;
     }
-  }
+  },
+
+  getInsights: async (data) => {
+    try {
+      const response = await api.post("/insights", { text: data });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching insights:", error);
+      throw error;
+    }
+  },
 };
 
 export default api;
