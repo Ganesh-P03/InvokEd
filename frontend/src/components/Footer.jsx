@@ -22,8 +22,6 @@ const Footer = ({ isAuthenticated }) => {
   const [transcript, setTranscript] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
   const [finalTranscript, setFinalTranscript] = useState("");
-  const [responseUrl, setResponseUrl] = useState(null); // Store API response URL
-  const [showUrlDialog, setShowUrlDialog] = useState(false); // Show dialog if isFrontend is false
 
   const recognitionRef = useRef(null);
   const transcriptRef = useRef("");
@@ -107,15 +105,14 @@ const Footer = ({ isAuthenticated }) => {
       console.log("AI Engine Response:", response);
 
       if (response.isFrontend) {
-        navigate(response.url); // Navigate to the URL if isFrontend is true
+        navigate(response.url); // Navigate to frontend URL
       } else {
-        setResponseUrl(response.url); // Display URL in a dialog if isFrontend is false
-        setShowUrlDialog(true);
+        const fullBackendUrl = `http://127.0.0.1:8000${response.url}/`; // Append base URL
+        navigate(`/bot?url=${encodeURIComponent(fullBackendUrl)}`); // Pass to /bot
       }
     } catch (error) {
       console.error("Error fetching AI response:", error);
-      setResponseUrl("An error occurred while processing your request.");
-      setShowUrlDialog(true);
+      alert("An error occurred while processing your request.");
     }
 
     setOpenDialog(false);
@@ -174,11 +171,10 @@ const Footer = ({ isAuthenticated }) => {
           open={openDialog}
           onClose={handleCancel}
           aria-labelledby="speech-dialog-title"
-          aria-describedby="speech-dialog-description"
         >
           <DialogTitle id="speech-dialog-title">Confirm Speech Text</DialogTitle>
           <DialogContent>
-            <DialogContentText id="speech-dialog-description">
+            <DialogContentText>
               Is this what you wanted to ask?
             </DialogContentText>
             <Typography 
@@ -200,25 +196,6 @@ const Footer = ({ isAuthenticated }) => {
             </Button>
             <Button onClick={handleConfirm} color="primary" variant="contained" autoFocus>
               Proceed
-            </Button>
-          </DialogActions>
-        </Dialog>
-
-        {/* URL Response Dialog (if isFrontend is false) */}
-        <Dialog
-          open={showUrlDialog}
-          onClose={() => setShowUrlDialog(false)}
-          aria-labelledby="response-dialog-title"
-        >
-          <DialogTitle id="response-dialog-title">Generated URL</DialogTitle>
-          <DialogContent>
-            <Typography variant="body1" sx={{ p: 2 }}>
-              {responseUrl}
-            </Typography>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setShowUrlDialog(false)} color="primary" variant="contained">
-              Close
             </Button>
           </DialogActions>
         </Dialog>
