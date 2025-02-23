@@ -1,5 +1,3 @@
-// This is Footer.jsx
-
 import React, { useState, useEffect, useRef } from "react";
 import { 
   AppBar, 
@@ -16,24 +14,22 @@ import {
 import { useNavigate } from "react-router-dom";
 import MicIcon from "@mui/icons-material/Mic";
 import MicOffIcon from "@mui/icons-material/MicOff";
+import { queryService } from "../services/ai_engine_api"; // Import the API service
 
-const Footer = ({ isAuthenticated, setIsAuthenticated }) => {
+const Footer = ({ isAuthenticated }) => {
   const navigate = useNavigate();
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
   const [finalTranscript, setFinalTranscript] = useState("");
-  
-  // Use refs to maintain values across renders
+
   const recognitionRef = useRef(null);
   const transcriptRef = useRef("");
-  
-  // Keep ref in sync with state
+
   useEffect(() => {
     transcriptRef.current = transcript;
   }, [transcript]);
-  
-  // Initialize speech recognition
+
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) return;
@@ -41,32 +37,28 @@ const Footer = ({ isAuthenticated, setIsAuthenticated }) => {
     const recognition = new SpeechRecognition();
     recognition.continuous = false;
     recognition.interimResults = true;
-    
+
     recognition.onresult = (event) => {
       const current = event.resultIndex;
       const currentTranscript = event.results[current][0].transcript;
       setTranscript(currentTranscript);
     };
-    
+
     recognition.onend = () => {
-      console.log("Speech recognition ended");
       setIsListening(false);
-      
-      // Important: Use ref value here to ensure we have the latest transcript
       if (transcriptRef.current) {
         setFinalTranscript(transcriptRef.current);
         setOpenDialog(true);
-        console.log("Dialog should open with:", transcriptRef.current);
       }
     };
-    
+
     recognition.onerror = (event) => {
       console.error("Speech recognition error", event.error);
       setIsListening(false);
     };
-    
+
     recognitionRef.current = recognition;
-    
+
     return () => {
       if (recognitionRef.current) {
         recognitionRef.current.onend = null;
@@ -76,21 +68,18 @@ const Footer = ({ isAuthenticated, setIsAuthenticated }) => {
     };
   }, []);
 
-  // Silence detection
   useEffect(() => {
     let silenceTimer;
     if (isListening && transcript) {
       silenceTimer = setTimeout(() => {
-        console.log("Silence detected, stopping recognition");
         if (recognitionRef.current) {
           recognitionRef.current.stop();
         }
-      }, 10000); // 10 seconds of silence
+      }, 15000);
     }
-    
     return () => clearTimeout(silenceTimer);
   }, [transcript, isListening]);
-  
+
   const toggleListening = () => {
     if (isListening) {
       if (recognitionRef.current) recognitionRef.current.stop();
@@ -100,7 +89,6 @@ const Footer = ({ isAuthenticated, setIsAuthenticated }) => {
         try {
           recognitionRef.current.start();
           setIsListening(true);
-          console.log("Started listening");
         } catch (error) {
           console.error("Failed to start recognition:", error);
           alert("There was an error starting speech recognition. Please try again.");
@@ -111,11 +99,22 @@ const Footer = ({ isAuthenticated, setIsAuthenticated }) => {
     }
   };
 
-  const handleConfirm = () => {
-    // Process the speech text here
-    console.log("Proceeding with:", finalTranscript);
-    // Handle the confirmed text (e.g., send to chatbot)
-    
+  const handleConfirm = async () => {
+    try {
+      const response = await queryService.sendQuery(finalTranscript);
+      console.log("AI Engine Response:", response);
+
+      if (response.isFrontend) {
+        navigate(response.url); // Navigate to frontend URL
+      } else {
+        const fullBackendUrl = `http://127.0.0.1:8000${response.url}/`; // Append base URL
+        navigate(`/bot?url=${encodeURIComponent(fullBackendUrl)}`); // Pass to /bot
+      }
+    } catch (error) {
+      console.error("Error fetching AI response:", error);
+      alert("An error occurred while processing your request.");
+    }
+
     setOpenDialog(false);
     setTranscript("");
     setFinalTranscript("");
@@ -127,14 +126,6 @@ const Footer = ({ isAuthenticated, setIsAuthenticated }) => {
     setFinalTranscript("");
   };
 
-  // Force dialog to stay open when it should be open
-  useEffect(() => {
-    if (finalTranscript && !openDialog) {
-      console.log("Forcing dialog open");
-      setOpenDialog(true);
-    }
-  }, [finalTranscript, openDialog]);
-
   return (
     isAuthenticated && (
       <>
@@ -143,8 +134,7 @@ const Footer = ({ isAuthenticated, setIsAuthenticated }) => {
             <Typography variant="heading1" sx={{ flexGrow: 1, fontSize: '1.2rem' }}>
               You are logged in as {localStorage.getItem("TID")}
             </Typography>
-            
-            {/* Display live transcript while speaking */}
+
             {isListening && transcript && (
               <Typography 
                 variant="body2" 
@@ -162,8 +152,7 @@ const Footer = ({ isAuthenticated, setIsAuthenticated }) => {
                 "{transcript}"
               </Typography>
             )}
-            
-            {/* Mic icon button */}
+
             <IconButton 
               color="inherit" 
               onClick={toggleListening}
@@ -177,16 +166,15 @@ const Footer = ({ isAuthenticated, setIsAuthenticated }) => {
           </Toolbar>
         </AppBar>
 
-        {/* Confirmation Dialog */}
+        {/* Speech Confirmation Dialog */}
         <Dialog
           open={openDialog}
           onClose={handleCancel}
           aria-labelledby="speech-dialog-title"
-          aria-describedby="speech-dialog-description"
         >
           <DialogTitle id="speech-dialog-title">Confirm Speech Text</DialogTitle>
           <DialogContent>
-            <DialogContentText id="speech-dialog-description">
+            <DialogContentText>
               Is this what you wanted to ask?
             </DialogContentText>
             <Typography 

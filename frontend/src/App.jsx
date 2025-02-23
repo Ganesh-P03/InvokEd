@@ -9,6 +9,7 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Student from "./components/Student";
 import "./App.css";
+import BotPage from "./components/Bot";
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(
@@ -51,6 +52,10 @@ const App = () => {
         <Route 
           path="/class/:id" 
           element={isAuthenticated ? <ClassWithDefaultTab /> : <Navigate to="/" />}
+        />
+        <Route 
+          path="/bot" 
+          element={isAuthenticated ? <BotPage /> : <Navigate to="/" />}
         />
         <Route 
             path="/students/:studentId" 

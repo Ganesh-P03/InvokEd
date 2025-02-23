@@ -26,6 +26,8 @@ server/apigateway/__pycache__
 server/apigateway/migrations/__pycache__
 server/backend/__pycache__
 
+frontend/package-lock.json
+
 # ChromaDB vector store
 vectorstore/
 
