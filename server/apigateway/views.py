@@ -8,6 +8,11 @@ from rest_framework.response import Response
 from rest_framework import status
 from datetime import date, timedelta
 from apigateway.syllabus_planning import get_module_completion_map, get_chapter_completion_map
+from django.utils.html import format_html
+from django.core.mail import send_mail
+from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
+import os
 
 # views for LoginInfo
 # 📌 URL: /logininfos/
@@ -859,3 +864,63 @@ def marks_detail(request, MarksID):
     elif request.method == 'DELETE':
         marks.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+# 📌 URL: /send_alert/
+@api_view(['POST'])
+def send_attendance_alert(request):
+    """
+    POST /send_alert/  -> Send an attendance summary email to the student's guardian.
+    Required Data: { "StudentID": "<StudentID>" }
+    """
+    student_id = request.data.get("StudentID")
+    print(request)
+    print(student_id)
+    if not student_id:
+        return JsonResponse({"error": "StudentID is required."}, status=400)
+    
+    student = get_object_or_404(Student, StudentID=student_id)
+    attendance_records = Attendance.objects.filter(StudentID=student).order_by("Date")
+    total_days = attendance_records.count()
+    days_present = attendance_records.filter(Status=1).count()
+    
+    # Calculate attendance percentage
+    attendance_percentage = (days_present / total_days * 100) if total_days > 0 else 0
+    
+    # Create attendance table
+    attendance_table = """
+    <table border='1' cellspacing='0' cellpadding='5'>
+        <tr>
+            <th style='text-align: left;'>Date</th>
+            <th style='text-align: left;'>Status</th>
+        </tr>
+    """
+    for record in attendance_records:
+        status = "Present" if record.Status == 1 else "Absent"
+        attendance_table += f"<tr><td>{record.Date}</td><td>{status}</td></tr>"
+    attendance_table += "</table>"
+    
+    # Email content
+    subject = f"Attendance Report for {student.Name}"
+    message = f"""
+    Dear {student.GuardianName},<br><br>
+    Here is the attendance summary for your child <strong>{student.Name}</strong>:<br><br>
+    <ul>
+        <li><strong>Total Days:</strong> {total_days}</li>
+        <li><strong>Days Present:</strong> {days_present}</li>
+        <li><strong>Attendance Percentage:</strong> {attendance_percentage:.2f}%</li>
+    </ul>
+    <br>
+    <strong>Detailed Attendance Record:</strong><br>
+    """
+    html_message = format_html(f"{message} {attendance_table}<br><br>Best Regards,<br>School Administration")
+    
+    send_mail(
+        subject,
+        message,
+        os.getenv('EMAIL_HOST_USER'),
+        [os.getenv('EMAIL_SEND_USER')],
+        fail_silently=False,
+        html_message=html_message,
+    )
+    
+    return JsonResponse({"message": "Attendance report sent successfully."})

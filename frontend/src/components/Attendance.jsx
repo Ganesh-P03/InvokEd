@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList } from 'recharts';
-import { attendanceService } from '../services/api';
+import { attendanceService, alertAttendanceService } from '../services/api';
+import { ToastContainer, toast } from 'react-toastify';
 import { 
   TextField, 
   Button, 
@@ -61,8 +62,9 @@ const Attendance = () => {
   const handleSendAlert = async (studentId, studentName) => {
     try {
       // Implement your alert sending logic here using an API call
+      const response = alertAttendanceService.sendAttendanceAlert(studentId);
       console.log(`Sending alert to ${studentName} (${studentId})`);
-      // You might want to add an API endpoint for sending alerts
+      toast(`Attendance report sent successfully to ${studentName}'s guardian!`);
     } catch (err) {
       console.error('Error sending alert:', err);
     }
@@ -313,6 +315,7 @@ const Attendance = () => {
           </TableBody>
         </Table>
       </TableContainer>
+      <ToastContainer />
     </Paper>
   );
 };

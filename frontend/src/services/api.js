@@ -97,4 +97,13 @@ export const studentService = {
   }
 };
 
+// alert attendance service
+export const alertAttendanceService = {
+  sendAttendanceAlert: async (studentId) => {
+    const response = await api.post("/alert-attendance/", { "StudentID": studentId });
+    return response.data;
+  }
+};
+
+
 export default api;
