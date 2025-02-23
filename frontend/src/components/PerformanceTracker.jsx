@@ -174,7 +174,7 @@ const PerformanceTracker = () => {
   }
 
   return (
-    <Paper elevation={1} sx={{ maxWidth: '900px', mx: '-100px', p: 4, mb: "105px" }}>
+    <Paper elevation={1} sx={{ minWidth: '900px', mx: '-100px', p: 4, mb: "105px" }}>
       <Typography variant="h4" gutterBottom>
         Performance Analytics
       </Typography>

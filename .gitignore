@@ -33,6 +33,7 @@ vectorstore/
 
 .env
 AIEngine/attendance/data/faces_data.pkl
+AIEngine/attendance/data/names.pkl
 frontend/src/assets/Attendance.json
 frontend/src/assets/Syllabus.json
 frontend/src/assets/Exams.json

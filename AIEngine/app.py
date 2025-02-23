@@ -112,7 +112,8 @@ def get_api():
 insights_prompt = PromptTemplate.from_template(
     """
     You are an analyst. Now analyze the following data and give the top 3 useful insights.
-    Ensure the response is strictly formatted as a JSON object.
+    Ensure the response is strictly formatted as a JSON object. Each insight should be on point and short.
+    Dont mention about 'status' when providing insights for attendance.
     
     JSON Format:
     {{

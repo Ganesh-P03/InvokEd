@@ -131,7 +131,7 @@ const Footer = ({ isAuthenticated }) => {
       if (response.isFrontend) {
         navigate(response.url); // Navigate to frontend URL
       } else {
-        const fullBackendUrl = `http://127.0.0.1:8000${response.url}/`; // Append base URL
+        const fullBackendUrl = `http://127.0.0.1:8000${response.url}`; // Append base URL
         navigate(`/bot?url=${encodeURIComponent(fullBackendUrl)}`); // Pass to /bot
       }
     } catch (error) {
