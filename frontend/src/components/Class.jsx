@@ -76,7 +76,7 @@ const ClassDetail = () => {
         </Tabs>
       </Box>
 
-      <Box sx={{ mt: 12, width: '100%', ml: '-25%' }}>
+      <Box sx={{ mt: 12, width: '100%' }}>
         {currentTab === 0 && <SyllabusPlanning/>}
         {currentTab === 1 && <Attendance />}
         {currentTab === 2 && <PerformanceTracker />}
