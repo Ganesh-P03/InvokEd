@@ -1,27 +1,27 @@
 url,Description,variables,isFrontend
-"/students","Get all students in the system","[]",false
-"/teachers","Get all teachers in the system","[]",false
-"/teachers/TeacherID","Get details of a particular Teacher given the rollnumber","['TeacherID']",false
-"/classrooms","Get all classrooms in the system","[]",false
-"/classrooms/ClassroomID","Get details of a particular Classroom given the classroom name","['ClassroomID']",false
-"/subjects","Get all subjects in the system","[]",false
-"/attendance","Get all attendance in the system","[]",false
+"/students/","Get all students in the system","[]",false
+"/teachers/","Get all teachers in the system","[]",false
+"/teachers/TeacherID/","Get details of a particular Teacher given the rollnumber","['TeacherID']",false
+"/classrooms/","Get all classrooms in the system","[]",false
+"/classrooms/ClassroomID/","Get details of a particular Classroom given the classroom name","['ClassroomID']",false
+"/subjects/","Get all subjects in the system","[]",false
+"/attendance/","Get all attendance in the system","[]",false
 "/attendance/?StudentId=StudentID","Get attendance of a particular student given a rollnumber","['StudentID']",false
-"/timetable/?ClassroomID=ClassroomID","Get timetable of a particular Classroom given the classroom name","['ClassroomID']",false
+"/timetable/?ClassroomID=ClassroomID","Give me timetable","['ClassroomID']",false
 "/syllabus/?ClassroomID=ClassroomID&SubjectId=SubjectID","Get syllabus given the classroom name and subject name","['ClassroomID','SubjectID']",false
-"/chapters","Get all chapters in the system","[]",false
+"/chapters/","Get all chapters in the system","[]",false
 "/chapters/?SyllabusID=SyllabusID","Get all chapters filtered by Syllabus ID","['SyllabusID']",false
-"/chapters/ChapterID","Get details of a specific chapter","['ChapterID']",false
-"/modules","Get all modules in the system","[]",false
+"/chapters/ChapterID/","Get details of a specific chapter","['ChapterID']",false
+"/modules/","Get all modules in the system","[]",false
 "/modules/?ChapterID=ChapterID","Get all modules filtered by Chapter ID","['ChapterID']",false
-"/modules/ModuleID","Get details of a specific module","['ModuleID']",false
-"/exams","Get all exams in the system","[]",false
+"/modules/ModuleID/","Get details of a specific module","['ModuleID']",false
+"/exams/","Get all exams in the system","[]",false
 "/exams/?StartDate=StartDate&EndDate=EndDate","Get all exams in a date range","['StartDate','EndDate']",false
 "/exams/?ParticularDate=ParticularDate","Get all exams on a specific date","['ParticularDate']",false
 "/exams/?SyllabusID=SyllabusID","Get all exams filtered by Syllabus ID","['SyllabusID']",false
 "/exams/?ChapterID=ChapterID","Get all exams filtered by Chapter ID","['ChapterID']",false
-"/exams/ExamID","Get details of a specific exam","['ExamID']",false
-"/marks","Get all marks in the system","[]",false
+"/exams/ExamID/","Get details of a specific exam","['ExamID']",false
+"/marks/","Get all marks in the system","[]",false
 "/marks/?StudentID=StudentID&ExamID=ExamID","Get marks filtered by Student ID and Exam ID","['StudentID','ExamID']",false
 "/students/StudentID","Get details of a particular Student given the rollnumber","['StudentID']",true
 "/home","Take me to homepage","[]",true

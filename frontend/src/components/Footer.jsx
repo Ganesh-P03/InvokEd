@@ -159,8 +159,8 @@ const Footer = ({ isAuthenticated }) => {
       if (response.isFrontend) {
         navigate(response.url);
       } else {
-        const fullBackendUrl = `http://127.0.0.1:8000${response.url}/`;
-        navigate(`/bot?url=${encodeURIComponent(fullBackendUrl)}`);
+        const fullBackendUrl = `http://127.0.0.1:8000${response.url}`; // Append base URL
+        navigate(`/bot?url=${encodeURIComponent(fullBackendUrl)}`); // Pass to /bot
       }
     } catch (error) {
       console.error("Error fetching AI response:", error);

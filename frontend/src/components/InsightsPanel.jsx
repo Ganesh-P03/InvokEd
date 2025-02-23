@@ -39,7 +39,7 @@ const InsightsPanel = ({ data }) => {
   };
 
   return (
-    <Card sx={{ minWidth: 400, backgroundColor: "#f5f5f5", p: 2, borderRadius: 3 }}>
+    <Card sx={{ minWidth: 350, backgroundColor: "#f5f5f5", p: 2, borderRadius: 3 }}>
       <CardContent>
         <Typography variant="h6" gutterBottom>
           🚀 AI Powered Insights

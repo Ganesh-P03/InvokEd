@@ -33,6 +33,7 @@ import {
   Scatter,
   ZAxis
 } from 'recharts';
+import InsightsPanel from './InsightsPanel';
 
 const PerformanceTracker = () => {
   const navigate = useNavigate();
@@ -174,7 +175,8 @@ const PerformanceTracker = () => {
   }
 
   return (
-    <Paper elevation={1} sx={{ maxWidth: '900px', mx: '-100px', p: 4, mb: "105px" }}>
+    <div style={{"display":"flex"}}>
+    <Paper elevation={1} sx={{ minWidth: '900px', p: 4, mb: "105px", mr:"40px" }}>
       <Typography variant="h4" gutterBottom>
         Performance Analytics
       </Typography>
@@ -359,6 +361,11 @@ const PerformanceTracker = () => {
         </Box>
       </Box>
     </Paper>
+
+    {selectedExam && (
+      <InsightsPanel data={selectedExam}/> )
+    }
+    </div>
   );
 };
 
