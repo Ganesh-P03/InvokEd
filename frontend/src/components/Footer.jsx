@@ -24,7 +24,7 @@ const Footer = ({ isAuthenticated }) => {
   const [transcript, setTranscript] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
   const [finalTranscript, setFinalTranscript] = useState("");
-  const [timer, setTimer] = useState(3);
+  const [timer, setTimer] = useState(5);
   const [progress, setProgress] = useState(100);
   const recognitionRef = useRef(null);
   const transcriptRef = useRef("");
@@ -50,7 +50,7 @@ const Footer = ({ isAuthenticated }) => {
       if (transcriptRef.current) {
         setFinalTranscript(transcriptRef.current);
         setOpenDialog(true);
-        setTimer(3);
+        setTimer(5);
         setProgress(100);
       }
     };
@@ -94,7 +94,7 @@ const Footer = ({ isAuthenticated }) => {
       // Update progress more frequently for smooth animation
       progressInterval = setInterval(() => {
         setProgress((prev) => {
-          const newProgress = prev - (100 / (3 * 60)); // 60 updates per second
+          const newProgress = prev - (100 / (5 * 60)); // 60 updates per second
           return newProgress > 0 ? newProgress : 0;
         });
       }, 1000 / 60); // 60 FPS
@@ -170,7 +170,7 @@ const Footer = ({ isAuthenticated }) => {
     setOpenDialog(false);
     setTranscript("");
     setFinalTranscript("");
-    setTimer(3);
+    setTimer(5);
     setProgress(100);
   };
 
@@ -178,7 +178,7 @@ const Footer = ({ isAuthenticated }) => {
     setOpenDialog(false);
     setTranscript("");
     setFinalTranscript("");
-    setTimer(3);
+    setTimer(5);
     setProgress(100);
   };
 

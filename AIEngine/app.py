@@ -33,6 +33,7 @@ prompt = PromptTemplate.from_template(
     - ClassroomIDs: ['7A', '7B', '8A', '8B', '9A'] (Default: '7A')
     - SubjectIDs: ['Mathematics', 'Science', 'Social', 'Physics', 'Chemistry'] (Default: 'Mathematics')
     - StudentIDs: ['S001', 'S002', 'S003', 'S004', 'S005', 'S006', 'S007', 'S008', 'S009', 'S010'] (Default: 'S001')
+    - SyllabusIds: [ '7A_Mathematics' ]
     
     **Text to Process:**
     {text}

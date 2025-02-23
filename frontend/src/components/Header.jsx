@@ -31,8 +31,8 @@ const Header = ({ isAuthenticated, setIsAuthenticated }) => { // Accept props
         </IconButton>
 
         {/* Title or other content in the header */}
-        <Typography variant="h6" sx={{ flexGrow: 1 }}>
-          My Application
+        <Typography variant="h5" sx={{ flexGrow: 1 }}>
+        EduYantra
         </Typography>
 
         {/* Box to align logout button to the right */}

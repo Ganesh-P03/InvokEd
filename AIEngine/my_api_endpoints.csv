@@ -10,7 +10,7 @@ url,Description,variables,isFrontend
 "/timetable/?ClassroomID=ClassroomID","Give me timetable","['ClassroomID']",false
 "/syllabus/?ClassroomID=ClassroomID&SubjectId=SubjectID","Get syllabus given the classroom name and subject name","['ClassroomID','SubjectID']",false
 "/chapters/","Get all chapters in the system","[]",false
-"/chapters/?SyllabusID=SyllabusID","Get all chapters filtered by Syllabus ID","['SyllabusID']",false
+"/chapters/?SyllabusID=SyllabusID","Get all chapters given class and subject","['SyllabusID']",false
 "/chapters/ChapterID/","Get details of a specific chapter","['ChapterID']",false
 "/modules/","Get all modules in the system","[]",false
 "/modules/?ChapterID=ChapterID","Get all modules filtered by Chapter ID","['ChapterID']",false
