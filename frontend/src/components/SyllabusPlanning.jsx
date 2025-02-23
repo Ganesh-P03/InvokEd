@@ -1,6 +1,5 @@
-// This is SyllabusPlanning.jsx
-
 import React, { useState, useEffect } from "react";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { 
   Box, 
   Button, 
@@ -18,235 +17,99 @@ import {
   TextField
 } from "@mui/material";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { syllabusService } from "../services/api";
 
-// Moved syllabusData here
-const syllabusData = {
-  "Syllabus": [
-    {
-      "SyllabusID": "SYL001",
-      "estimated_completion_date": "2025-03-18",
-      "ClassroomID": "7A",
-      "SubjectID": "Mathematics",
-      "TID": "T001"
-    },
-    {
-      "SyllabusID": "SYL002",
-      "estimated_completion_date": "2025-03-20",
-      "ClassroomID": "7A",
-      "SubjectID": "Social",
-      "TID": "T002"
-    },
-    {
-      "SyllabusID": "SYL003",
-      "estimated_completion_date": "2025-03-22",
-      "ClassroomID": "7A",
-      "SubjectID": "Science",
-      "TID": "T003"
-    }
-  ],
-  "Chapters": [
-    {
-      "ChapterID": "CH001",
-      "estimated_completion_date": "2025-03-18",
-      "ChapterName": "Algebra Basics",
-      "TargetDate": "2025-02-20",
-      "SyllabusID": "SYL001"
-    },
-    {
-      "ChapterID": "CH002",
-      "estimated_completion_date": "2025-03-15",
-      "ChapterName": "Linear Equations",
-      "TargetDate": "2025-02-27",
-      "SyllabusID": "SYL001"
-    },
-    {
-      "ChapterID": "CH001",
-      "estimated_completion_date": "2025-03-18",
-      "ChapterName": "Algebra Basics",
-      "TargetDate": "2025-02-20",
-      "SyllabusID": "SYL001"
-    },
-    {
-      "ChapterID": "CH002",
-      "estimated_completion_date": "2025-03-15",
-      "ChapterName": "Linear Equations",
-      "TargetDate": "2025-02-27",
-      "SyllabusID": "SYL001"
-    },
-    {
-      "ChapterID": "CH001",
-      "estimated_completion_date": "2025-03-18",
-      "ChapterName": "Algebra Basics",
-      "TargetDate": "2025-02-20",
-      "SyllabusID": "SYL001"
-    },
-    {
-      "ChapterID": "CH002",
-      "estimated_completion_date": "2025-03-15",
-      "ChapterName": "Linear Equations",
-      "TargetDate": "2025-02-27",
-      "SyllabusID": "SYL001"
-    },
-    {
-      "ChapterID": "CH001",
-      "estimated_completion_date": "2025-03-18",
-      "ChapterName": "Algebra Basics",
-      "TargetDate": "2025-02-20",
-      "SyllabusID": "SYL001"
-    },
-    {
-      "ChapterID": "CH002",
-      "estimated_completion_date": "2025-03-15",
-      "ChapterName": "Linear Equations",
-      "TargetDate": "2025-02-27",
-      "SyllabusID": "SYL001"
-    },
-    {
-      "ChapterID": "CH003",
-      "estimated_completion_date": "2025-03-10",
-      "ChapterName": "Ancient Civilizations",
-      "TargetDate": "2025-02-25",
-      "SyllabusID": "SYL002"
-    },
-    {
-      "ChapterID": "CH004",
-      "estimated_completion_date": "2025-03-12",
-      "ChapterName": "Modern History",
-      "TargetDate": "2025-03-01",
-      "SyllabusID": "SYL002"
-    },
-    {
-      "ChapterID": "CH005",
-      "estimated_completion_date": "2025-03-17",
-      "ChapterName": "Physics Fundamentals",
-      "TargetDate": "2025-02-28",
-      "SyllabusID": "SYL003"
-    },
-    {
-      "ChapterID": "CH006",
-      "estimated_completion_date": "2025-03-20",
-      "ChapterName": "Biology Basics",
-      "TargetDate": "2025-03-05",
-      "SyllabusID": "SYL003"
-    }
-  ],
-  "Modules": [
-    {
-      "ModuleID": "MOD001",
-      "estimated_completion_date": "2025-02-25",
-      "ModuleName": "Introduction to Algebra",
-      "RemainingTime": 2,
-      "URL": "https://example.com/algebra-intro",
-      "ThisWeek": true,
-      "ChapterID": "CH001"
-    },
-    {
-      "ModuleID": "MOD002",
-      "estimated_completion_date": "2025-02-27",
-      "ModuleName": "Basic Algebraic Operations",
-      "RemainingTime": 3,
-      "URL": "https://example.com/algebra-operations",
-      "ThisWeek": true,
-      "ChapterID": "CH001"
-    },
-    {
-      "ModuleID": "MOD006",
-      "estimated_completion_date": "2025-02-27",
-      "ModuleName": "Understanding Linear Equations",
-      "RemainingTime": 3,
-      "URL": "https://example.com/linear-equations",
-      "ThisWeek": true,
-      "ChapterID": "CH002"
-    },
-    {
-      "ModuleID": "MOD007",
-      "estimated_completion_date": "2025-03-01",
-      "ModuleName": "Graphing Linear Equations",
-      "RemainingTime": 4,
-      "URL": "https://example.com/graphing-linear",
-      "ThisWeek": true,
-      "ChapterID": "CH002"
-    },
-    {
-      "ModuleID": "MOD010",
-      "estimated_completion_date": "2025-02-28",
-      "ModuleName": "Introduction to Civilizations",
-      "RemainingTime": 3,
-      "URL": "https://example.com/civilizations-intro",
-      "ThisWeek": true,
-      "ChapterID": "CH003"
-    },
-    {
-      "ModuleID": "MOD011",
-      "estimated_completion_date": "2025-03-05",
-      "ModuleName": "Major Historical Events",
-      "RemainingTime": 4,
-      "URL": "https://example.com/history-events",
-      "ThisWeek": true,
-      "ChapterID": "CH004"
-    },
-    {
-      "ModuleID": "MOD012",
-      "estimated_completion_date": "2025-03-03",
-      "ModuleName": "Introduction to Physics",
-      "RemainingTime": 3,
-      "URL": "https://example.com/physics-intro",
-      "ThisWeek": true,
-      "ChapterID": "CH005"
-    },
-    {
-      "ModuleID": "MOD013",
-      "estimated_completion_date": "2025-03-08",
-      "ModuleName": "Basic Biological Systems",
-      "RemainingTime": 4,
-      "URL": "https://example.com/biology-basics",
-      "ThisWeek": true,
-      "ChapterID": "CH006"
-    }
-  ]
+const formatDate = (dateString) => {
+  if (!dateString) return 'No date set';
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return 'Invalid date';
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  } catch (error) {
+    console.error("Error formatting date:", error);
+    return 'Invalid date';
+  }
 };
 
-const SyllabusPlanning = ({ classroomId, TID }) => {
-  const [editingModule, setEditingModule] = useState(null);
+const SyllabusPlanning = () => {
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState({ chapters: [], modules: [] });
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingModule, setEditingModule] = useState(null);
   const [tempEditData, setTempEditData] = useState({
     ThisWeek: false,
     RemainingTime: 0
   });
-  const [relevantData, setRelevantData] = useState({
-    syllabus: null,
-    chapters: [],
-    modules: []
-  });
+  const [updating, setUpdating] = useState(false);
+
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [TID, setTID] = useState("");
+  const [Type, setType] = useState("");
+  const [currentTab, setCurrentTab] = useState(0);
+  const [subjectID, setSubjectID] = useState("");
 
   useEffect(() => {
-    // Filter relevant data based on ClassroomID and TID
-    const relevantSyllabus = syllabusData.Syllabus.find(
-      s => s.ClassroomID === classroomId && s.TID === TID
-    );
+    const tidFromParams = searchParams.get("TID");
+    const typeFromParams = searchParams.get("Type");
+    const subjectIDFromParams = searchParams.get("SubjectID");
+    const tabFromParams = searchParams.get("tab");
+    const tabMapping = {
+      'syllabus': 0,
+      'attendance': 1,
+      'performance': 2
+    };
+    
+    setTID(tidFromParams || localStorage.getItem("TID") || "");
+    setType(typeFromParams || localStorage.getItem("Type") || "");
+    setSubjectID(subjectIDFromParams || "");
+    setCurrentTab(tabMapping[tabFromParams] || 0);
+  }, [searchParams]);
 
-    if (relevantSyllabus) {
-      const relevantChapters = syllabusData.Chapters.filter(
-        ch => ch.SyllabusID === relevantSyllabus.SyllabusID
-      );
-
-      const relevantModules = syllabusData.Modules.filter(
-        mod => relevantChapters.some(ch => ch.ChapterID === mod.ChapterID)
-      );
-
-      setRelevantData({
-        syllabus: relevantSyllabus,
-        chapters: relevantChapters,
-        modules: relevantModules
-      });
+  const fetchModules = async (chapterId) => {
+    try {
+      const moduleData = await syllabusService.getModules(chapterId);
+      return moduleData;
+    } catch (error) {
+      console.error("Error fetching modules:", error);
+      return [];
     }
-  }, [classroomId, TID]);
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const syllabusId = `${id}_${subjectID}`;
+        const chapters = await syllabusService.getChapters(syllabusId);
+        const modulesPromises = chapters.map(chapter => fetchModules(chapter.ChapterID));
+        const modulesData = await Promise.all(modulesPromises);
+        
+        setData({
+          chapters,
+          modules: modulesData.flat()
+        });
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id && subjectID) {
+      fetchData();
+    }
+  }, [id, subjectID]);
 
   const handleModuleEdit = (module) => {
     setEditingModule(module);
     setTempEditData({
-      ThisWeek: module.ThisWeek,
-      RemainingTime: module.RemainingTime
+      ThisWeek: module.ThisWeek || false,
+      RemainingTime: module.RemainingTime || 0
     });
     setDialogOpen(true);
   };
@@ -258,79 +121,109 @@ const SyllabusPlanning = ({ classroomId, TID }) => {
       ThisWeek: false,
       RemainingTime: 0
     });
+    setUpdating(false);
   };
 
-  const handleSubmitChanges = () => {
-    const updatedModules = relevantData.modules.map(mod => 
-      mod.ModuleID === editingModule.ModuleID
-        ? { ...mod, ...tempEditData }
-        : mod
-    );
+  const handleSubmitChanges = async () => {
+    if (!editingModule) return;
+    
+    setUpdating(true);
+    try {
+      // Ensure the update data matches the API structure
+      const updateData = {
+        ModuleID: editingModule.ModuleID,
+        ChapterID: editingModule.ChapterID,
+        ModuleName: editingModule.ModuleName,
+        URL: editingModule.URL,
+        ThisWeek: tempEditData.ThisWeek,
+        RemainingTime: tempEditData.RemainingTime,
+        estimated_completion_date: editingModule.estimated_completion_date, // Ensure this is included if required
+      };
+  
+      console.log("Submitting Data: ", updateData);
+  
+      // Make the API call
+      await syllabusService.putModules(editingModule.ModuleID, updateData);
+  
+      // Update local state
+      setData(prevData => ({
+        ...prevData,
+        modules: prevData.modules.map(mod =>
+          mod.ModuleID === editingModule.ModuleID
+            ? { ...mod, ...updateData }
+            : mod
+        ),
+      }));
+  
+      handleDialogClose();
+    } catch (error) {
+      console.error("Error updating module:", error);
+      alert("Failed to update module. Please try again.");
+    } finally {
+      setUpdating(false);
+    }
+    console.error("Error updating module:", error.response?.data || error);
 
-    setRelevantData({
-      ...relevantData,
-      modules: updatedModules
-    });
+  };  
 
-    handleDialogClose();
-  };
+  if (loading) return <Typography>Loading...</Typography>;
 
   return (
     <Box sx={{mt: 2, mb: 10}}>
-      {relevantData.chapters.map(chapter => (
+      {data.chapters.map((chapter) => (
         <Accordion key={chapter.ChapterID}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', width: '55vw' }}>
               <Typography variant="h6">{chapter.ChapterName}</Typography>
-              <Typography variant="caption">
-                Target Date: {new Date(chapter.TargetDate).toLocaleDateString()}
+              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                Target Date: {formatDate(chapter.targetDate)}
               </Typography>
-              <Typography variant="caption">
-                Estimated Completion: {new Date(chapter.estimated_completion_date).toLocaleDateString()}
+              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                Estimated Completion: {formatDate(chapter.estimated_completion_date)}
               </Typography>
             </Box>
           </AccordionSummary>
           <AccordionDetails>
-            {relevantData.modules
-              .filter(module => module.ChapterID === chapter.ChapterID)
-              .map(module => (
+            {data.modules
+              .filter((module) => module.ChapterID === chapter.ChapterID)
+              .map((module) => (
                 <Box 
-                  key={module.ModuleID} 
+                  key={module.ModuleID}
                   sx={{ 
-                    border: '1px solid #ddd', 
-                    borderRadius: 1, 
-                    p: 2, 
-                    mb: 1 
+                    border: '1px solid #ddd',
+                    borderRadius: 1,
+                    p: 2,
+                    mb: 1
                   }}
                 >
-                  <Typography variant="subtitle1" sx={{ textAlign: 'left' }}>{module.ModuleName}</Typography>
-                  <Typography variant="body2" sx={{ textAlign: 'left' }}>
+                  <Typography variant="subtitle1">{module.ModuleName}</Typography>
+                  <Typography variant="body2">
                     URL: <a href={module.URL} target="_blank" rel="noopener noreferrer">{module.URL}</a>
                   </Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
                     <RadioGroup 
                       row 
-                      value={module.ThisWeek.toString()} 
+                      value={module.ThisWeek ? "true" : "false"}
                       onChange={() => handleModuleEdit(module)}
                     >
                       <FormControlLabel 
-                        value="true" 
-                        control={<Radio />} 
-                        label="This Week" 
+                        value="true"
+                        control={<Radio />}
+                        label="This Week"
                       />
                       <FormControlLabel 
-                        value="false" 
-                        control={<Radio />} 
-                        label="Not This Week" 
+                        value="false"
+                        control={<Radio />}
+                        label="Not This Week"
                       />
                     </RadioGroup>
                     <Box sx={{ ml: 2 }}>
                       <Typography variant="body2" component="span" sx={{ mr: 1 }}>
-                        Remaining Time: {module.RemainingTime} hours
+                        Remaining Time: {module.RemainingTime || 0} hours
                       </Typography>
                       <Button 
-                        size="small" 
-                        variant="outlined" 
+                        size="small"
+                        variant="outlined"
                         onClick={() => handleModuleEdit(module)}
                       >
                         Edit
@@ -357,19 +250,25 @@ const SyllabusPlanning = ({ classroomId, TID }) => {
             <FormControlLabel value="false" control={<Radio />} label="Not This Week" />
           </RadioGroup>
           <TextField
-            label="Remaining Time (days)"
+            label="Remaining Time (hours)"
             type="number"
             value={tempEditData.RemainingTime}
             onChange={(e) => setTempEditData({
               ...tempEditData,
-              RemainingTime: parseInt(e.target.value, 10)
+              RemainingTime: parseInt(e.target.value, 10) || 0
             })}
             sx={{ mt: 2 }}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDialogClose}>Cancel</Button>
-          <Button onClick={handleSubmitChanges} variant="contained">Submit</Button>
+          <Button onClick={handleDialogClose} disabled={updating}>Cancel</Button>
+          <Button 
+            onClick={handleSubmitChanges} 
+            variant="contained" 
+            disabled={updating}
+          >
+            {updating ? 'Updating...' : 'Submit'}
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>

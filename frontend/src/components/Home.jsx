@@ -4,64 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Box, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
-
-// Classroom data
-const classroomData = [
-  { ClassroomID: "6A", ClassTeacherID: "T001" },
-  { ClassroomID: "7A", ClassTeacherID: "T003" },
-  { ClassroomID: "8A", ClassTeacherID: "T005" },
-  { ClassroomID: "8B", ClassTeacherID: "T006" },
-  { ClassroomID: "9A", ClassTeacherID: "T007" },
-  { ClassroomID: "9B", ClassTeacherID: "T008" },
-  { ClassroomID: "10A", ClassTeacherID: "T009" },
-  { ClassroomID: "10B", ClassTeacherID: "T010" },
-];
-
-// Classes handled by different teachers
-const classroomsHandledByTeachers = {
-  "T001": [
-    { ClassroomID: "6A", ClassTeacherID: "T001" },
-    { ClassroomID: "7A", ClassTeacherID: "T003" },
-    { ClassroomID: "7B", ClassTeacherID: "T004" },
-    { ClassroomID: "8A", ClassTeacherID: "T005" },
-    { ClassroomID: "9A", ClassTeacherID: "T007" },
-  ],
-  "T002": [
-    { ClassroomID: "7A", ClassTeacherID: "T003" },
-    { ClassroomID: "8B", ClassTeacherID: "T006" },
-    { ClassroomID: "9B", ClassTeacherID: "T008" },
-    { ClassroomID: "10A", ClassTeacherID: "T009" },
-    { ClassroomID: "10B", ClassTeacherID: "T010" },
-  ],
-  "T003": classroomData, // Headmaster has access to all classrooms
-};
-
-// Teacher details with required fields
-
-const loggedInTeacherDetails = [
-  { 
-    TID: "T001", 
-    Name: "Sarah Johnson", 
-    DateofJoining: "2018-08-15", 
-    Phone: "555-123-4567", 
-    SubjectID: "Mathematics" 
-  },
-  { 
-    TID: "T002", 
-    Name: "Michael Chen", 
-    DateofJoining: "2016-07-20", 
-    Phone: "555-234-5678", 
-    SubjectID: "Social" 
-  },
-  { 
-    TID: "T003", 
-    Name: "Amelia Patel", 
-    DateofJoining: "2019-01-10", 
-    Phone: "555-345-6789", 
-    SubjectID: "Science" 
-  }
-
-];
+import { classroomService, teacherService } from "../services/api";
 
 // 🎨 Background colors for each classroom (Google Classroom style)
 const bgColors = [
@@ -213,35 +156,39 @@ const Home = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Get TID and Type from URL params or localStorage
-    const tidFromParams = searchParams.get("TID");
-    const typeFromParams = searchParams.get("Type");
-    
-    const tid = tidFromParams || localStorage.getItem("TID") || "";
-    const type = typeFromParams || localStorage.getItem("Type") || "";
-    
-    setTid(tid);
-    setType(type);
-    
-    // Determine which classrooms to display based on Type
-    if (type === "Headmaster") {
-      setClassrooms(classroomData);
-    } else if (tid && classroomsHandledByTeachers[tid]) {
-      setClassrooms(classroomsHandledByTeachers[tid]);
-    } else {
-      setClassrooms([]);
-    }
+    const fetchData = async () => {
+      const tidFromParams = searchParams.get("TID");
+      const typeFromParams = searchParams.get("Type");
+
+      const tid = tidFromParams || localStorage.getItem("TID") || "";
+      const type = typeFromParams || localStorage.getItem("Type") || "";
+
+      setTid(tid);
+      setType(type);
+
+      try {
+        const response = await teacherService.getSyllabus(tid);
+        setClassrooms(response);
+      } catch (error) {
+        console.error("Error fetching classrooms:", error);
+      }
+    };
+
+    fetchData();
   }, [searchParams]);
 
-  // Function to navigate to classroom with preserved query parameters
-const navigateToClassroom = (classroomID) => {
-  // Find the subject ID for the logged-in teacher
-  const currentTeacher = loggedInTeacherDetails.find(teacher => teacher.TID === TID);
-  const subjectID = currentTeacher ? currentTeacher.SubjectID : "";
+  const navigateToClassroom = async (classroomID) => {
+    try {
+      const teacherDetails = await teacherService.getSyllabus(TID);
+      // Extract SubjectID from the first syllabus or default to an empty string
+      const subjectID = teacherDetails?.[0]?.SubjectID || "";
   
-  // Create the URL with preserved query parameters including SubjectID
-  navigate(`/class/${classroomID}?TID=${TID}&Type=${Type}&SubjectID=${subjectID}`);
-};
+      navigate(`/class/${classroomID}?TID=${TID}&Type=${Type}&SubjectID=${subjectID}`);
+    } catch (error) {
+      console.error("Error fetching teacher details:", error);
+    }
+  };
+  
 
   return (
     <div>
@@ -249,19 +196,16 @@ const navigateToClassroom = (classroomID) => {
         <Typography variant="h4" sx={{ mb: 3, textAlign: "center", color: "#333" }}>
           {Type === "Headmaster" ? "All Classrooms" : "Your Assigned Classrooms"}
         </Typography>
-        
+
         <Grid container spacing={2} columns={12} justifyContent="center">
           {classrooms.map((item, index) => (
             <Grid item xs={12} sm={6} md={4} key={item.ClassroomID} display="flex" justifyContent="center">
-              <Item
-                index={index}
-                onClick={() => navigateToClassroom(item.ClassroomID)}
-              >
+              <Item index={index} onClick={() => navigateToClassroom(item.ClassroomID)}>
                 {item.ClassroomID}
               </Item>
             </Grid>
           ))}
-          
+
           {classrooms.length === 0 && (
             <Typography variant="h6" sx={{ mt: 4, textAlign: "center", width: "100%" }}>
               No classrooms assigned.
