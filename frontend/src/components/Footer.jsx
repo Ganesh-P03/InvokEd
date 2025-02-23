@@ -151,8 +151,8 @@ const Footer = ({ isAuthenticated }) => {
 
   const handleConfirm = async () => {
     try {
-      await speak("Sure, let me show you the details");
-      await new Promise((resolve) => setTimeout(resolve, 2500));
+      await speak("Sure, let me help you with that.");
+      await new Promise((resolve) => setTimeout(resolve, 100));
       const response = await queryService.sendQuery(finalTranscript);
       console.log("AI Engine Response:", response);
 
