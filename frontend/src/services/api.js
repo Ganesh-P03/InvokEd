@@ -89,4 +89,12 @@ export const performanceService = {
   }
 };
 
+// Student services
+export const studentService = {
+  getStudent: async (studentId) => {
+    const response = await api.get(`/students/${studentId}/`);
+    return response.data;
+  }
+};
+
 export default api;

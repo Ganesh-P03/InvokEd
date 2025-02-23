@@ -55,7 +55,7 @@ const Attendance = () => {
   };
 
   const handleStudentClick = (studentId) => {
-    navigate(`/student/${studentId}`);
+    navigate(`/students/${studentId}`);
   };
 
   const handleSendAlert = async (studentId, studentName) => {

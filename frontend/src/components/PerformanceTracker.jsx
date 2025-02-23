@@ -1,3 +1,5 @@
+// This is PerformanceTracker.jsx
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { performanceService } from '../services/api';
@@ -86,7 +88,7 @@ const PerformanceTracker = () => {
   };
 
   const handleStudentClick = (studentId) => {
-    navigate(`/student/${studentId}`);
+    navigate(`/students/${studentId}`);
   };
 
   // Process data for the line chart - with safety checks

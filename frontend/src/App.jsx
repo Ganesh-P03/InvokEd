@@ -7,6 +7,7 @@ import Home from "./components/Home";
 import Class from "./components/Class";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import Student from "./components/Student";
 import "./App.css";
 
 const App = () => {
@@ -50,6 +51,10 @@ const App = () => {
         <Route 
           path="/class/:id" 
           element={isAuthenticated ? <ClassWithDefaultTab /> : <Navigate to="/" />}
+        />
+        <Route 
+            path="/students/:studentId" 
+            element={isAuthenticated ? <Student /> : <Navigate to="/" />}
         />
       </Routes>
       <Footer isAuthenticated={isAuthenticated} setIsAuthenticated={setIsAuthenticated} />
