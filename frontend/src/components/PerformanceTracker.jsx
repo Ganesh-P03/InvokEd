@@ -176,7 +176,7 @@ const PerformanceTracker = () => {
 
   return (
     <div style={{"display":"flex"}}>
-    <Paper elevation={1} sx={{ minWidth: '900px', p: 4, mb: "105px", mr:"40px" }}>
+    <Paper elevation={1} sx={{ minWidth: '860px', p: 4, mb: "105px", mr:"40px" }}>
       <Typography variant="h4" gutterBottom>
         Performance Analytics
       </Typography>
