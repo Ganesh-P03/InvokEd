@@ -25,6 +25,6 @@ url,Description,variables,isFrontend
 "/marks/?StudentID=StudentID&ExamID=ExamID","Get marks filtered by Student ID and Exam ID","['StudentID','ExamID']",false
 "/students/StudentID","Get details of a particular Student given the rollnumber","['StudentID']",true
 "/home","Take me to homepage","[]",true
-"/class/ClassroomID/Type=Teacher&SubjectID=SubjectID&tab=syllabus","Give me syllabus given a classroom name and subject name","['ClassroomID','SubjectID']",true
+"/class/ClassroomID/?Type=Teacher&SubjectID=SubjectID&tab=syllabus","Give me syllabus given a classroom name and subject name","['ClassroomID','SubjectID']",true
 "/class/ClassroomID/?tab=attendance","Give me attendance of class given classroom name","['ClassroomID']",true
-"/class/ClassroomID/Type=Teacher&SubjectID=SubjectID&tab=performance","Give me performance of class given classroom name and subject name","['ClassroomID','SubjectID']",true
+"/class/ClassroomID/?Type=Teacher&SubjectID=SubjectID&tab=performance","Give me performance of class given classroom name and subject name","['ClassroomID','SubjectID']",true

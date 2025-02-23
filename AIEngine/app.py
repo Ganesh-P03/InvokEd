@@ -21,17 +21,18 @@ llm = ChatGroq(
 # Predefine the prompt template and chain
 prompt = PromptTemplate.from_template(
     """
-    You are an intelligent data extractor. Given the following text, identify and extract the required fields listed below.
+    You are an intelligent data extractor. Given the following text, extract the required fields listed below.
     
     - Ensure the response is **strictly formatted** as a JSON object without any additional text.
     - Match the extracted fields to the dataset provided below.
-    - If a field is missing or not explicitly stated, return **null** for that field instead of guessing.
+    - If a field is missing or not explicitly stated, return the **first available value** from the corresponding dataset instead of guessing.
     
-    **Fields to extract:** {fields}
+    **Fields to Extract:** {fields}
     
     **Dataset for Reference:**
-    - ClassroomIDs: ['7A', '7B', '8A', '8B', '9A']
-    - SubjectIDs: ['Mathematics', 'Science', 'Social', 'Physics', 'Chemistry']
+    - ClassroomIDs: ['7A', '7B', '8A', '8B', '9A'] (Default: '7A')
+    - SubjectIDs: ['Mathematics', 'Science', 'Social', 'Physics', 'Chemistry'] (Default: 'Mathematics')
+    - StudentIDs: ['S001', 'S002', 'S003', 'S004', 'S005', 'S006', 'S007', 'S008', 'S009', 'S010'] (Default: 'S001')
     
     **Text to Process:**
     {text}
@@ -151,4 +152,4 @@ def get_insights():  # Renamed function to avoid conflicts
     return jsonify(extracted_data)
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=6000, debug=True)
+    app.run(host='0.0.0.0', port=8888, debug=True)

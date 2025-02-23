@@ -23,6 +23,7 @@
     "@react-aria/dialog": "^3.5.21",
     "@react-aria/i18n": "^3.12.5",
     "@react-aria/overlays": "^3.25.0",
+    "axios": "^1.7.9",
     "date-fns": "^4.1.0",
     "react": "^19.0.0",
     "react-aria": "^3.37.0",

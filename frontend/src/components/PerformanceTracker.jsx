@@ -75,6 +75,7 @@ const PerformanceTracker = () => {
       setLoading(true);
       setError(null);
       const data = await performanceService.getExams(id_subjectID);
+      console.log(data)
       setExamsData(Array.isArray(data) ? data : []);
     } catch (err) {
       setError('Failed to fetch exam data. Please try again later.');
@@ -138,7 +139,7 @@ const PerformanceTracker = () => {
       return (
         <Paper sx={{ p: 2, bgcolor: 'background.paper' }}>
           <Typography variant="body2">{`Student: ${data?.StudentName || ''}`}</Typography>
-          <Typography variant="body2">{`Marks: ${Number(payload[0]?.value || 0).toFixed(1)}`}</Typography>
+          <Typography variant="body2">{`Marks: ${data?.Marks || 0}`}</Typography>
           <Typography variant="body2">{`Exam: ${data?.ExamName || ''}`}</Typography>
         </Paper>
       );
