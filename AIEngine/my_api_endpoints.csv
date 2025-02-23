@@ -1,26 +1,30 @@
-url,Description,variables
-"/students","Get all students in the system","[]"
-"/students/StudentID","Get details of a particular Student given the rollnumber","['StudentID']"
-"/teachers","Get all teachers in the system","[]"
-"/teachers/TeacherID","Get details of a particular Teacher given the rollnumber","['TeacherID']"
-"/classrooms","Get all classrooms in the system","[]"
-"/classrooms/ClassroomID","Get details of a particular Classroom given the classroom name","['ClassroomID']"
-"/subjects","Get all subjects in the system","[]"
-"/attendance","Get all attendance in the system","[]"
-"/attendance/?StudentId=StudentID","Get attendance of a particular student given a rollnumber","['StudentID']"
-"/timetable/?ClassroomId=<ClassroomID>","Get timetable of a particular Classroom given the classroom name","['ClassroomID']"
-"/syllabus/?ClassroomId=<ClassroomID>&SubjectId=<SubjectID>","Get syllabus given the classroom name and subject name","['ClassroomID','SubjectID']"
-"/chapters","Get all chapters in the system","[]"
-"/chapters/?SyllabusID=<SyllabusID>","Get all chapters filtered by Syllabus ID","['SyllabusID']"
-"/chapters/ChapterID","Get details of a specific chapter","['ChapterID']"
-"/modules","Get all modules in the system","[]"
-"/modules/?ChapterID=<ChapterID>","Get all modules filtered by Chapter ID","['ChapterID']"
-"/modules/ModuleID","Get details of a specific module","['ModuleID']"
-"/exams","Get all exams in the system","[]"
-"/exams/?StartDate=<StartDate>&EndDate=<EndDate>","Get all exams in a date range","['StartDate','EndDate']"
-"/exams/?ParticularDate=<ParticularDate>","Get all exams on a specific date","['ParticularDate']"
-"/exams/?SyllabusID=<SyllabusID>","Get all exams filtered by Syllabus ID","['SyllabusID']"
-"/exams/?ChapterID=<ChapterID>","Get all exams filtered by Chapter ID","['ChapterID']"
-"/exams/ExamID","Get details of a specific exam","['ExamID']"
-"/marks","Get all marks in the system","[]"
-"/marks/?StudentID=<StudentID>&ExamID=<ExamID>","Get marks filtered by Student ID and Exam ID","['StudentID','ExamID']"
+url,Description,variables,isFrontend
+"/students","Get all students in the system","[]",false
+"/teachers","Get all teachers in the system","[]",false
+"/teachers/TeacherID","Get details of a particular Teacher given the rollnumber","['TeacherID']",false
+"/classrooms","Get all classrooms in the system","[]",false
+"/classrooms/ClassroomID","Get details of a particular Classroom given the classroom name","['ClassroomID']",false
+"/subjects","Get all subjects in the system","[]",false
+"/attendance","Get all attendance in the system","[]",false
+"/attendance/?StudentId=StudentID","Get attendance of a particular student given a rollnumber","['StudentID']",false
+"/timetable/?ClassroomID=ClassroomID","Get timetable of a particular Classroom given the classroom name","['ClassroomID']",false
+"/syllabus/?ClassroomID=ClassroomID&SubjectId=SubjectID","Get syllabus given the classroom name and subject name","['ClassroomID','SubjectID']",false
+"/chapters","Get all chapters in the system","[]",false
+"/chapters/?SyllabusID=SyllabusID","Get all chapters filtered by Syllabus ID","['SyllabusID']",false
+"/chapters/ChapterID","Get details of a specific chapter","['ChapterID']",false
+"/modules","Get all modules in the system","[]",false
+"/modules/?ChapterID=ChapterID","Get all modules filtered by Chapter ID","['ChapterID']",false
+"/modules/ModuleID","Get details of a specific module","['ModuleID']",false
+"/exams","Get all exams in the system","[]",false
+"/exams/?StartDate=StartDate&EndDate=EndDate","Get all exams in a date range","['StartDate','EndDate']",false
+"/exams/?ParticularDate=ParticularDate","Get all exams on a specific date","['ParticularDate']",false
+"/exams/?SyllabusID=SyllabusID","Get all exams filtered by Syllabus ID","['SyllabusID']",false
+"/exams/?ChapterID=ChapterID","Get all exams filtered by Chapter ID","['ChapterID']",false
+"/exams/ExamID","Get details of a specific exam","['ExamID']",false
+"/marks","Get all marks in the system","[]",false
+"/marks/?StudentID=StudentID&ExamID=ExamID","Get marks filtered by Student ID and Exam ID","['StudentID','ExamID']",false
+"/students/StudentID","Get details of a particular Student given the rollnumber","['StudentID']",true
+"/home","Take me to homepage","[]",true
+"/class/ClassroomID/Type=Teacher&SubjectID=SubjectID&tab=syllabus","Give me syllabus given a classroom name and subject name","['ClassroomID','SubjectID']",true
+"/class/ClassroomID/?tab=attendance","Give me attendance of class given classroom name","['ClassroomID']",true
+"/class/ClassroomID/Type=Teacher&SubjectID=SubjectID&tab=performance","Give me performance of class given classroom name and subject name","['ClassroomID','SubjectID']",true
