@@ -170,8 +170,8 @@ const SyllabusPlanning = () => {
 
   return (
     <Box sx={{mt: 2, mb: 10}}>
-      {data.chapters.map((chapter) => (
-        <Accordion key={chapter.ChapterID}>
+      {data.chapters.map((chapter,index) => (
+        <Accordion key={chapter.ChapterID} defaultExpanded={index === 0}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
               <Typography variant="h6">{chapter.ChapterName}</Typography>
