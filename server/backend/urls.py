@@ -22,7 +22,8 @@ from apigateway.views import subject_list, subject_detail,teacher_list,teacher_d
                              student_detail,attendance_list,attendance_detail,\
                              timetable_detail,timetable_list,syllabus_detail,syllabus_list, \
                              chapter_list,chapter_detail,module_list,module_detail, \
-                             exam_list,exam_detail,marks_list,marks_detail, send_attendance_alert
+                             exam_list,exam_detail,marks_list,marks_detail, send_attendance_alert, \
+                             send_syllabus_alert
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -75,5 +76,6 @@ urlpatterns = [
     path('marks/', marks_list, name='marks_list'),  # To list marks with optional filters
     path('marks/<str:MarksID>/', marks_detail, name='marks_detail'),  # To view/update/delete a specific marks entry
 
-    path('alert-attendance/', send_attendance_alert, name='send_attendance_alert')
+    path('alert-attendance/', send_attendance_alert, name='send_attendance_alert'),
+    path('alert-syllabus/', send_syllabus_alert, name='send_syllabus_alert')
 ]

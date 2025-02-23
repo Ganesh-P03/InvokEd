@@ -24,7 +24,9 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import EditIcon from '@mui/icons-material/Edit';
-import { syllabusService } from "../services/api";
+import { syllabusService, alertSyllabusService } from "../services/api";
+import { Warning, Send } from '@mui/icons-material';
+import { ToastContainer, toast } from 'react-toastify';
 
 const formatDate = (dateString) => {
   if (!dateString) return 'No date set';
@@ -130,6 +132,19 @@ const SyllabusPlanning = () => {
     });
     setUpdating(false);
   };
+
+  const handleSendSyllabusDetails = async () => {
+    try {
+      // Implement your alert sending logic here using an API call
+      const syllabusId = `${id}_${subjectID}`;
+      const response = alertSyllabusService.sendSyllabusAlert(syllabusId);
+      console.log(`Sending alert ${syllabusId}`);
+      toast(`Upcoming syllabus report sent successfully`);
+    } catch (err) {
+      console.error('Error sending alert:', err);
+    }
+  };
+  
 
   const handleSubmitChanges = async () => {
     if (!editingModule) return;
@@ -270,6 +285,22 @@ const SyllabusPlanning = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <Button
+        variant="contained"
+        color="success"
+        size="small"
+        startIcon={<Send />}
+        onClick={() =>  handleSendSyllabusDetails()}
+        sx={{
+          textTransform: 'none',
+          minWidth: '120px',
+          marginTop: '50px'
+        }}
+      >
+        Send Syllabus Details
+      </Button>
+      <ToastContainer />
     </Box>
   );
 };

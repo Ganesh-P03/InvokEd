@@ -924,3 +924,41 @@ def send_attendance_alert(request):
     )
     
     return JsonResponse({"message": "Attendance report sent successfully."})
+
+def format_syllabus_email(modules):
+    email_body = """Subject: Weekly Syllabus Alert\n\nHere are the modules scheduled for this week:\n\n"""
+    
+    for module in modules:
+        email_body += f"Chapter: {module.ChapterID.ChapterName}\n"
+        email_body += f"Module: {module.ModuleName}\n"
+        email_body += f"Teaching Hours: {module.RemainingTime}\n"
+        email_body += f"Practice Resource: {module.URL if module.URL else 'N/A'}\n"
+        email_body += "-" * 50 + "\n"
+
+    return email_body
+
+@api_view(['POST'])
+def send_syllabus_alert(request):
+    syllabus_id = request.data.get("SyllabusID")
+    if not syllabus_id:
+        return Response({"error": "SyllabusID is required"}, status=400)
+    
+    try:
+        syllabus = Syllabus.objects.get(SyllabusID=syllabus_id)
+    except Syllabus.DoesNotExist:
+        return Response({"error": "Syllabus not found"}, status=404)
+    
+    modules = Module.objects.filter(ChapterID__SyllabusID=syllabus, ThisWeek=True)
+    if not modules.exists():
+        return Response({"message": "No modules scheduled for this week."})
+    
+    email_content = format_syllabus_email(modules)
+    send_mail(
+        "Weekly Syllabus Alert",
+        email_content,
+        os.getenv('EMAIL_HOST_USER'),
+        [os.getenv('EMAIL_SEND_USER')],
+        fail_silently=False,
+    )
+    
+    return Response({"message": "Syllabus alert email sent successfully!"})

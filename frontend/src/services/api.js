@@ -105,5 +105,12 @@ export const alertAttendanceService = {
   }
 };
 
+// alert syllabus service
+export const alertSyllabusService = {
+  sendSyllabusAlert: async (syllabusId) => {
+    const response = await api.post("/alert-syllabus/", { "SyllabusID": syllabusId });
+    return response.data;
+  }
+};
 
 export default api;
