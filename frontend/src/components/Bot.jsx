@@ -49,7 +49,7 @@ const BotPage = () => {
 
   return (
     <Paper sx={{ p: 3, mt: 4 }}>
-      <Typography variant="h5" sx={{ mb: 2 }}>Backend Response</Typography>
+      <Typography variant="h5" sx={{ mb: 2 }}>Bot Response</Typography>
 
       {loading ? (
         <CircularProgress />
