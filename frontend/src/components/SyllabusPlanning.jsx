@@ -7,16 +7,23 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  Radio,
-  RadioGroup,
-  FormControlLabel,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
-  TextField
+  TextField,
+  Switch,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  IconButton
 } from "@mui/material";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import EditIcon from '@mui/icons-material/Edit';
 import { syllabusService } from "../services/api";
 
 const formatDate = (dateString) => {
@@ -129,7 +136,6 @@ const SyllabusPlanning = () => {
     
     setUpdating(true);
     try {
-      // Ensure the update data matches the API structure
       const updateData = {
         ModuleID: editingModule.ModuleID,
         ChapterID: editingModule.ChapterID,
@@ -137,15 +143,11 @@ const SyllabusPlanning = () => {
         URL: editingModule.URL,
         ThisWeek: tempEditData.ThisWeek,
         RemainingTime: tempEditData.RemainingTime,
-        estimated_completion_date: editingModule.estimated_completion_date, // Ensure this is included if required
+        estimated_completion_date: editingModule.estimated_completion_date
       };
   
-      console.log("Submitting Data: ", updateData);
-  
-      // Make the API call
       await syllabusService.putModules(editingModule.ModuleID, updateData);
   
-      // Update local state
       setData(prevData => ({
         ...prevData,
         modules: prevData.modules.map(mod =>
@@ -162,8 +164,6 @@ const SyllabusPlanning = () => {
     } finally {
       setUpdating(false);
     }
-    console.error("Error updating module:", error.response?.data || error);
-
   };  
 
   if (loading) return <Typography>Loading...</Typography>;
@@ -173,65 +173,64 @@ const SyllabusPlanning = () => {
       {data.chapters.map((chapter) => (
         <Accordion key={chapter.ChapterID}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Box sx={{ display: 'flex', flexDirection: 'column', width: '55vw' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
               <Typography variant="h6">{chapter.ChapterName}</Typography>
               <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                Target Date: {formatDate(chapter.targetDate)}
-              </Typography>
-              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                Target Date: {formatDate(chapter.targetDate)} | 
                 Estimated Completion: {formatDate(chapter.estimated_completion_date)}
               </Typography>
             </Box>
           </AccordionSummary>
           <AccordionDetails>
-            {data.modules
-              .filter((module) => module.ChapterID === chapter.ChapterID)
-              .map((module) => (
-                <Box 
-                  key={module.ModuleID}
-                  sx={{ 
-                    border: '1px solid #ddd',
-                    borderRadius: 1,
-                    p: 2,
-                    mb: 1
-                  }}
-                >
-                  <Typography variant="subtitle1">{module.ModuleName}</Typography>
-                  <Typography variant="body2">
-                    URL: <a href={module.URL} target="_blank" rel="noopener noreferrer">{module.URL}</a>
-                  </Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
-                    <RadioGroup 
-                      row 
-                      value={module.ThisWeek ? "true" : "false"}
-                      onChange={() => handleModuleEdit(module)}
-                    >
-                      <FormControlLabel 
-                        value="true"
-                        control={<Radio />}
-                        label="This Week"
-                      />
-                      <FormControlLabel 
-                        value="false"
-                        control={<Radio />}
-                        label="Not This Week"
-                      />
-                    </RadioGroup>
-                    <Box sx={{ ml: 2 }}>
-                      <Typography variant="body2" component="span" sx={{ mr: 1 }}>
-                        Remaining Time: {module.RemainingTime || 0} hours
-                      </Typography>
-                      <Button 
-                        size="small"
-                        variant="outlined"
-                        onClick={() => handleModuleEdit(module)}
-                      >
-                        Edit
-                      </Button>
-                    </Box>
-                  </Box>
-                </Box>
-              ))}
+            <TableContainer component={Paper} sx={{ mb: 2 }}>
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Module Name</TableCell>
+                    <TableCell>URL</TableCell>
+                    <TableCell align="center">This Week</TableCell>
+                    <TableCell align="center">Remaining Time (hrs)</TableCell>
+                    <TableCell align="center">Est. Completion Date</TableCell>
+                    <TableCell align="center">Edit</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {data.modules
+                    .filter((module) => module.ChapterID === chapter.ChapterID)
+                    .map((module) => (
+                      <TableRow key={module.ModuleID}>
+                        <TableCell>{module.ModuleName}</TableCell>
+                        <TableCell>
+                          <a href={module.URL} target="_blank" rel="noopener noreferrer">
+                            {module.URL}
+                          </a>
+                        </TableCell>
+                        <TableCell align="center">
+                          <Switch
+                            checked={module.ThisWeek || false}
+                            onChange={() => handleModuleEdit(module)}
+                          />
+                        </TableCell>
+                        <TableCell align="center">
+                          {module.RemainingTime || 0}
+                        </TableCell>
+                        <TableCell align="center">
+                          {formatDate(module.estimated_completion_date)}
+                        </TableCell>
+                        <TableCell align="center">
+                          <IconButton 
+                            size="small"
+                            onClick={() => handleModuleEdit(module)}
+                            sx={{ color: 'primary.main' }}
+                          >
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
           </AccordionDetails>
         </Accordion>
       ))}
@@ -239,25 +238,25 @@ const SyllabusPlanning = () => {
       <Dialog open={dialogOpen} onClose={handleDialogClose}>
         <DialogTitle>Edit Module Details</DialogTitle>
         <DialogContent>
-          <RadioGroup 
-            value={tempEditData.ThisWeek.toString()}
-            onChange={(e) => setTempEditData({
-              ...tempEditData,
-              ThisWeek: e.target.value === "true"
-            })}
-          >
-            <FormControlLabel value="true" control={<Radio />} label="This Week" />
-            <FormControlLabel value="false" control={<Radio />} label="Not This Week" />
-          </RadioGroup>
+          <Box sx={{ mb: 2, mt: 1 }}>
+            <Typography>This Week</Typography>
+            <Switch
+              checked={tempEditData.ThisWeek}
+              onChange={(e) => setTempEditData({
+                ...tempEditData,
+                ThisWeek: e.target.checked
+              })}
+            />
+          </Box>
           <TextField
             label="Remaining Time (hours)"
             type="number"
+            fullWidth
             value={tempEditData.RemainingTime}
             onChange={(e) => setTempEditData({
               ...tempEditData,
               RemainingTime: parseInt(e.target.value, 10) || 0
             })}
-            sx={{ mt: 2 }}
           />
         </DialogContent>
         <DialogActions>
